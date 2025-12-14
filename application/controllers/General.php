@@ -69,6 +69,22 @@ class General extends CI_Controller
 
         }
 
+        if ($table == 'tsk_project_info') {
+            $query = $this->db->query(" 
+                select 
+                a.* 
+                from tsk_project_info as a  
+                where a.project_id = '" . $rec_id . "'
+            ");
+
+            $rec_list = array();
+
+            foreach ($query->result_array() as $row) {
+                $rec_list = $row;
+            }
+
+        }
+
 
         $this->db->close();
 
@@ -100,6 +116,11 @@ class General extends CI_Controller
             $this->db->where('client_id', $rec_id);
             $this->db->update('tsk_clients_info', array('status' => 'Delete'));
             echo "Client Deleted Successfully";
+        }
+        if ($table == 'tsk_project_info') {
+            $this->db->where('project_id', $rec_id);
+            $this->db->update('tsk_project_info', array('status' => 'Delete'));
+            echo "Project Deleted Successfully";
         }
 
 
