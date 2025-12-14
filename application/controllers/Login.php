@@ -4,79 +4,87 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Login extends CI_Controller
 {
 
-    	 
-public function index()
-	{
-	   
-	    $data['js'] = '';
-        $data['login'] = true; 
-       
-       	 
+
+    public function index()
+    {
+
+        $data['js'] = '';
+        $data['login'] = true;
+
+
         $this->load->library('form_validation');
         $this->form_validation->set_rules('user_name', 'User Name', 'required');
-        $this->form_validation->set_rules('user_pwd', 'Password', 'required',array('required' => 'You must provide %s.'));
-        if ($this->form_validation->run() == FALSE)
-        {
-             
-            $this->load->view('page/login',$data); 
-        }
-        else
-        {
-              
-           //$this->db->query('SET GLOBAL sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"');   
-              
-              
-            $user_info = array(); 
-            
-              $sql = "
+        $this->form_validation->set_rules('user_pwd', 'Password', 'required', array('required' => 'You must provide %s.'));
+        if ($this->form_validation->run() == FALSE) {
+
+            $this->load->view('page/login', $data);
+        } else {
+
+            //$this->db->query('SET GLOBAL sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"');   
+
+
+            $user_info = array();
+
+            $sql = "
               select 
               a.user_id as id, 
               a.staff_name , 
               a.user_name as  user_name , 
               a.level  
               from user_login_info as a  
-              where a.user_name = '".$this->input->post('user_name')."' 
-              and a.user_pwd = '".$this->input->post('user_pwd')."' 
+              where a.user_name = '" . $this->input->post('user_name') . "' 
+              and a.user_pwd = '" . $this->input->post('user_pwd') . "' 
               and a.status = 'Active' 
-            "; 
-          
-            $query = $this->db->query($sql); 
+            ";
 
-            $cnt = $query->num_rows(); 
-            
-            
-             
+            $query = $this->db->query($sql);
+
+            $cnt = $query->num_rows();
+
+
+
             $row = $query->row();
-            
-            if (isset($row))
-            { 
+
+            if ($row) {
+
                 $newdata = array(
-                    SESS_HD . 'user_id'  => $row->id,
-                    SESS_HD . 'user_name'  => $row->user_name, 
-                    SESS_HD . 'staff_name'  => $row->staff_name,  
-                    SESS_HD . 'level'  =>  $row->level, 
+                    SESS_HD . 'user_id' => $row->id,
+                    SESS_HD . 'user_name' => $row->user_name,
+                    SESS_HD . 'staff_name' => $row->staff_name,
+                    SESS_HD . 'level' => $row->level,
                     SESS_HD . 'logged_in' => TRUE,
                     SESS_HD . 'login_time' => time()
-               );
-               
-                $this->session->set_userdata($newdata); 
-              
-                redirect('dash');   
-            
-            } 
-            else 
-            {
-				$data['msg'] = ' Invalid User';
-				$data['login'] =false;	                 
-				$this->load->view('page/login',$data);
-			} 			 
-        } 		
-	}  
-    
+                );
+
+                $this->session->set_userdata($newdata);
+
+                // ✅ success flashdata
+                $this->session->set_flashdata(
+                    'login_success',
+                    'Welcome back, ' . ucfirst($row->staff_name) . '!'
+                );
+
+                redirect('login'); // redirect to login view (toast will show)
+
+            } else {
+
+                // ✅ error flashdata
+                $this->session->set_flashdata(
+                    'login_error',
+                    'Invalid Username or Password'
+                );
+
+                redirect('login');
+            }
+
+
+        }
+    }
+
 
     public function logout($reason = 'manual')
     {
-        
+
 
         // Flash message
         if ($reason === 'timeout') {

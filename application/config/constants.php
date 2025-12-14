@@ -87,7 +87,7 @@ defined('EXIT__AUTO_MAX') or define('EXIT__AUTO_MAX', 125); // highest automatic
 defined('EDIT_ALLOW_DAYS') or define('EDIT_ALLOW_DAYS', 1);
 
 defined('SESS_HD') or define('SESS_HD', 'ERP_PSM_');
-defined('PG_HEAD') or define('PG_HEAD', 'ERP PSM System');  
+defined('PG_HEAD') or define('PG_HEAD', 'Task Management');  
 defined('COMPANY') or define('COMPANY', '-');  
  
  
