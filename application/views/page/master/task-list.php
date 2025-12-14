@@ -1,4 +1,5 @@
 <?php include_once(VIEWPATH . '/inc/header.php'); ?>
+
 <section class="content-header">
     <h1>Task Management</h1>
     <ol class="breadcrumb">
@@ -10,23 +11,22 @@
 <section class="content">
     <div class="box box-primary">
         <div class="box-header with-border">
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#task_modal">
+            <button type="button" class="btn btn-success" id="add_new_task">
                 <i class="fa fa-plus-circle"></i> Create New Task
             </button>
         </div>
-
         <div class="box-body table-responsive">
             <table class="table table-bordered table-hover table-striped">
                 <thead>
                     <tr>
-                        <th width="50">S.No</th>
+                        <th>S.No</th>
                         <th>Task Title</th>
                         <th>Client / Project</th>
                         <th>Priority</th>
                         <th>Status</th>
                         <th>Due Date</th>
-                        <th>Assigned To</th>
-                        <th width="100">Actions</th>
+                        <th><i class="fa fa-user-tie text-muted"></i> Assigned To</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,9 +37,7 @@
                         <td>
                             <strong><?= htmlspecialchars($row['task_title']) ?></strong>
                             <?php if ($row['task_description']): ?>
-                                <br><small class="text-muted">
-                                    <?= character_limiter(strip_tags($row['task_description']), 80) ?>
-                                </small>
+                                <br><small class="text-muted"><?= character_limiter(strip_tags($row['task_description']), 80) ?></small>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -56,9 +54,7 @@
                         </td>
                         <td>
                             <?php if ($row['due_date']): ?>
-                                <?php
-                                $overdue = strtotime($row['due_date']) < time() && $row['task_status'] != 'Completed';
-                                ?>
+                                <?php $overdue = strtotime($row['due_date']) < time() && $row['task_status'] != 'Completed'; ?>
                                 <span class="<?= $overdue ? 'text-red' : '' ?>">
                                     <?= date('d M Y', strtotime($row['due_date'])) ?>
                                     <?= $overdue ? ' <i class="fa fa-exclamation-triangle"></i>' : '' ?>
@@ -68,16 +64,12 @@
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?= $row['assigned_employees'] ? htmlspecialchars($row['assigned_employees']) : '<em class="text-muted">Not Assigned</em>' ?>
+                            <?= $row['assigned_employees'] ? '<i class="fa fa-user-tie text-primary"></i> ' . htmlspecialchars($row['assigned_employees']) : '<em class="text-muted"><i class="fa fa-user-slash"></i> Not Assigned</em>' ?>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-xs btn-primary edit_record" value="<?= $row['task_id'] ?>">
-                                <i class="fa fa-edit"></i>
-                            </button>
+                            <button class="btn btn-xs btn-primary edit_record" value="<?= $row['task_id'] ?>"><i class="fa fa-edit"></i></button>
                             <?php if ($this->session->userdata(SESS_HD . 'level') == 'Admin'): ?>
-                            <button class="btn btn-xs btn-danger del_record" value="<?= $row['task_id'] ?>">
-                                <i class="fa fa-trash"></i>
-                            </button>
+                            <button class="btn btn-xs btn-danger del_record" value="<?= $row['task_id'] ?>"><i class="fa fa-trash"></i></button>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -85,7 +77,6 @@
                 </tbody>
             </table>
         </div>
-
         <div class="box-footer clearfix">
             <div class="pull-left"><strong>Total Tasks: <?= $total_records ?></strong></div>
             <div class="pull-right"><?= $pagination ?></div>
@@ -99,7 +90,7 @@
         <div class="modal-content">
             <form method="post" id="task_form">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
                     <h4 class="modal-title" id="modal_title">Create New Task</h4>
                     <input type="hidden" name="mode" id="form_mode" value="Add">
                     <input type="hidden" name="task_id" id="task_id">
@@ -108,11 +99,11 @@
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Client <span class="text-danger">*</span></label>
-                            <?= form_dropdown('client_id', $client_opt, '', 'class="form-control" id="client_id" required') ?>
+                            <?= form_dropdown('client_id', $client_opt, '', 'class="form-control select2" id="client_id" required style="width:100%"') ?>
                         </div>
                         <div class="col-md-6 form-group">
                             <label>Project <span class="text-danger">*</span></label>
-                            <?= form_dropdown('project_id', $project_opt, '', 'class="form-control" id="project_id" required') ?>
+                            <?= form_dropdown('project_id', $project_opt, '', 'class="form-control select2" id="project_id" required style="width:100%"') ?>
                         </div>
                     </div>
 
@@ -129,7 +120,7 @@
                     <div class="row">
                         <div class="col-md-3 form-group">
                             <label>Priority</label>
-                            <select name="priority" id="priority" class="form-control">
+                            <select name="priority" id="priority" class="form-control select2">
                                 <option value="Low">Low</option>
                                 <option value="Medium" selected>Medium</option>
                                 <option value="High">High</option>
@@ -137,7 +128,7 @@
                         </div>
                         <div class="col-md-3 form-group">
                             <label>Status</label>
-                            <select name="task_status" id="task_status" class="form-control">
+                            <select name="task_status" id="task_status" class="form-control select2">
                                 <option value="Pending">Pending</option>
                                 <option value="In Progress">In Progress</option>
                                 <option value="Completed">Completed</option>
@@ -154,12 +145,16 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Assign To Employees <small>(Hold Ctrl/Cmd to select multiple)</small></label>
-                        <select name="assigned_to[]" id="assigned_to" multiple class="form-control" style="height:150px;">
+                        <label><i class="fa fa-user-tie"></i> Assign To Employees</label>
+                        <select name="assigned_to[]" id="assigned_to" class="form-control" multiple="multiple" style="width:100%">
                             <?php foreach ($employees as $emp): ?>
-                                <option value="<?= $emp['employee_id'] ?>"><?= htmlspecialchars($emp['employee_name']) ?></option>
+                                <?php $initials = strtoupper(substr($emp['employee_name'], 0, 2)); ?>
+                                <option value="<?= $emp['employee_id'] ?>" data-initials="<?= $initials ?>">
+                                    <?= htmlspecialchars($emp['employee_name']) ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
+                        <small class="text-muted">Type to search • Select multiple • Click × to remove</small>
                     </div>
                 </div>
                 <div class="modal-footer">
