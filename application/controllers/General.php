@@ -36,6 +36,26 @@ class General extends CI_Controller
         $rec_id = $this->input->post('id');
 
 
+  if ($table == 'tsk_assign_info') {
+
+    $query = $this->db->query(" 
+        SELECT 
+            a.assigned_to 
+        FROM tsk_assign_info AS a  
+        WHERE a.task_id = '" . $rec_id . "'
+        AND a.status = 'Active'
+    ");
+
+    $rec_list = array();
+
+    foreach ($query->result_array() as $row) {
+        $rec_list[] = $row['assigned_to'];   // multiple employee IDs
+    }
+
+    echo json_encode($rec_list);
+    exit;
+}
+
 
         if ($table == 'sas_blood_group_info') {
             $query = $this->db->query(" 

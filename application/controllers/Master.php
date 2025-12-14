@@ -804,7 +804,7 @@ class Master extends CI_Controller
         $this->load->view('page/master/' . $data['s_url'], $data);
     }
 
-public function task_list()
+  public function task_list($page = 0)
 {
     if (!$this->session->userdata(SESS_HD . 'logged_in')) {
         redirect();
@@ -816,9 +816,7 @@ public function task_list()
         exit;
     }
 
-    // FIX: Load text helper for character_limiter / word_limiter
     $this->load->helper('text');
-
     $data['js'] = 'task-list.inc';
 
     /* ===================== ADD TASK ===================== */
@@ -883,7 +881,7 @@ public function task_list()
         $this->db->where('task_id', $task_id);
         $this->db->update('tsk_task_info', $upd);
 
-        // Delete old assignments
+        // Remove old assignments
         $this->db->where('task_id', $task_id)->delete('tsk_assign_info');
 
         // Insert new assignments
@@ -906,6 +904,7 @@ public function task_list()
         redirect('task-list/');
     }
 
+    // Pagination
     $this->load->library('pagination');
 
     $this->db->where('t.status !=', 'Delete');
@@ -931,7 +930,7 @@ public function task_list()
     $config['next_link'] = "Next";
     $this->pagination->initialize($config);
 
-    // Dropdowns
+    // Dropdown options
     $data['client_opt'] = ['' => 'Select Client'];
     $clients = $this->db->where('status !=', 'Delete')->order_by('client_name')->get('tsk_clients_info')->result_array();
     foreach ($clients as $c) $data['client_opt'][$c['client_id']] = $c['client_name'];
@@ -940,14 +939,13 @@ public function task_list()
     $projects = $this->db->where('status !=', 'Delete')->order_by('project_name')->get('tsk_project_info')->result_array();
     foreach ($projects as $p) $data['project_opt'][$p['project_id']] = $p['project_name'];
 
-    // FIX: Correct employee table and fields
     $data['employees'] = $this->db->select('employee_id, employee_name')
                                   ->where('status', 'Active')
                                   ->order_by('employee_name')
                                   ->get('tsk_employee_info')
                                   ->result_array();
 
-    // Task List Query
+    // List query
     $sql = "
         SELECT 
             t.*,
@@ -962,14 +960,13 @@ public function task_list()
         WHERE t.status != 'Delete'
         GROUP BY t.task_id
         ORDER BY t.due_date ASC, t.priority DESC, t.task_id DESC
-        LIMIT " . $this->uri->segment(2, 0) . ", " . $config['per_page'];
+        LIMIT " . (int)$this->uri->segment(2, 0) . ", " . $config['per_page'];
 
     $data['record_list'] = $this->db->query($sql)->result_array();
     $data['pagination'] = $this->pagination->create_links();
 
     $this->load->view('page/master/task-list', $data);
 }
-
 
 
 
