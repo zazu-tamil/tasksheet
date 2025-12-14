@@ -33,8 +33,26 @@ class General extends CI_Controller
 
 
         $table = $this->input->post('tbl');
-        $rec_id = $this->input->post('id'); 
-         
+        $rec_id = $this->input->post('id');
+
+
+
+        if ($table == 'tsk_clients_info') {
+            $query = $this->db->query(" 
+                select 
+                a.* 
+                from tsk_clients_info as a  
+                where a.client_id = '" . $rec_id . "'
+            ");
+
+            $rec_list = array();
+
+            foreach ($query->result_array() as $row) {
+                $rec_list = $row;
+            }
+
+        }
+
         if ($table == 'user_login_info') {
             $query = $this->db->query(" 
                 select 
@@ -50,7 +68,7 @@ class General extends CI_Controller
             }
 
         }
-       
+
 
         $this->db->close();
 
@@ -71,13 +89,19 @@ class General extends CI_Controller
         $table = $this->input->post('tbl');
         $rec_id = $this->input->post('id');
 
- 
+
         if ($table == 'user_login_info') {
             $this->db->where('user_id', $rec_id);
             $this->db->update('user_login_info', array('status' => 'Delete'));
             echo "Record Deleted Successfully";
         }
-       
+
+        if ($table == 'tsk_clients_info') {
+            $this->db->where('client_id', $rec_id);
+            $this->db->update('tsk_clients_info', array('status' => 'Delete'));
+            echo "Client Deleted Successfully";
+        }
+
 
     }
 

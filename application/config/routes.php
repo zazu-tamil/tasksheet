@@ -71,3 +71,7 @@ $route['get-content'] = 'general/get_content';
 $route['user-list'] = 'master/user_list';
 $route['user-list/(:num)'] = 'master/user_list/$1';
  
+
+
+$route['client-list'] = 'master/client_list';
+$route['client-list/(:num)'] = 'master/client_list/$1';
