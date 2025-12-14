@@ -37,6 +37,90 @@ class General extends CI_Controller
 
 
 
+            if ($table == 'sas_blood_group_info') {
+            $query = $this->db->query(" 
+                select 
+                a.* 
+                from sas_blood_group_info as a  
+                where a.blood_group_id = '" . $rec_id . "'
+            ");
+
+            $rec_list = array();
+
+            foreach ($query->result_array() as $row) {
+                $rec_list = $row;
+            }
+
+        }
+
+
+            if ($table == 'tsk_emp_type_info') {
+            $query = $this->db->query(" 
+                select 
+                a.* 
+                from tsk_emp_type_info as a  
+                where a.emp_type_id = '" . $rec_id . "'
+            ");
+
+            $rec_list = array();
+
+            foreach ($query->result_array() as $row) {
+                $rec_list = $row;
+            }
+
+        }
+
+
+          if ($table == 'tsk_emp_category_info') {
+            $query = $this->db->query(" 
+                select 
+                a.* 
+                from tsk_emp_category_info as a  
+                where a.emp_category_id = '" . $rec_id . "'
+            ");
+
+            $rec_list = array();
+
+            foreach ($query->result_array() as $row) {
+                $rec_list = $row;
+            }
+
+        }
+
+        if ($table == 'get-designation') {
+            $query = $this->db->query(" 
+                    select 
+                    a.*
+                    from tsk_designation_info as a
+                    where a.employee_category = '" . $rec_id . "'  
+                    and a.status = 'Active'
+                    order by a.designation_name asc
+                    ");
+
+            $rec_list = array();
+
+            foreach ($query->result_array() as $row) {
+                $rec_list[] = $row;
+            }
+        }
+
+        if ($table == 'designation_info') {
+            $query = $this->db->query(" 
+                select 
+                a.*
+                from tsk_designation_info as a
+                where a.designation_id = '" . $rec_id . "'  
+                order by a.designation_id asc
+                ");
+
+            $rec_list = array();
+
+            foreach ($query->result_array() as $row) {
+                $rec_list = $row;
+            }
+        }
+
+
         if ($table == 'tsk_clients_info') {
             $query = $this->db->query(" 
                 select 
@@ -104,6 +188,25 @@ class General extends CI_Controller
 
         $table = $this->input->post('tbl');
         $rec_id = $this->input->post('id');
+
+
+        if ($table == 'sas_blood_group_info') {
+    $this->db->where('blood_group_id', $rec_id);
+    $this->db->update('sas_blood_group_info', array('status' => 'Delete'));
+    echo "Blood Group Deleted Successfully";
+}
+
+        if ($table == 'tsk_emp_type_info') {
+    $this->db->where('emp_type_id', $rec_id);
+    $this->db->update('tsk_emp_type_info', array('status' => 'Delete'));
+    echo "Employee Type Deleted Successfully";
+}
+
+        if ($table == 'tsk_emp_category_info') {
+            $this->db->where('emp_category_id', $rec_id);
+            $this->db->update('tsk_emp_category_info', array('status' => 'Delete'));
+            echo "Category Deleted Successfully";
+        }
 
 
         if ($table == 'user_login_info') {

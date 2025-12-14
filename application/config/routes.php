@@ -76,3 +76,16 @@ $route['project-list/(:num)'] = 'master/project_list/$1';
 
 $route['client-list'] = 'master/client_list';
 $route['client-list/(:num)'] = 'master/client_list/$1';
+
+
+$route['create-employee'] = 'master/add_employee'; 
+$route['edit-employee/(:num)'] = 'master/edit_employee/$1'; 
+
+$route['emp-category-list'] = 'master/emp_category_list';
+$route['emp-category-list/(:num)'] = 'master/emp_category_list/$1';
+
+$route['emp-type-list'] = 'master/emp_type_list';
+$route['emp-type-list/(:num)'] = 'master/emp_type_list/$1';
+
+$route['blood-group-list'] = 'master/blood_group_list';
+$route['blood-group-list/(:num)'] = 'master/blood_group_list/$1';
