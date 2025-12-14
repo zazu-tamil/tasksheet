@@ -804,159 +804,171 @@ class Master extends CI_Controller
         $this->load->view('page/master/' . $data['s_url'], $data);
     }
 
-    public function task_list()
-    {
-        // Check login
-        if (!$this->session->userdata(SESS_HD . 'logged_in')) {
-            redirect('login'); // or wherever your login page is
-        }
-
-        // Optional: Restrict access to Admin/Staff only
-        $allowed_levels = ['Admin', 'Staff'];
-        if (!in_array($this->session->userdata(SESS_HD . 'level'), $allowed_levels)) {
-            echo "<h3 style='color:red;'>Permission Denied</h3>";
-            exit;
-        }
-
-        $data['js'] = 'task-list.inc';
-
-        // Add New Task
-        if ($this->input->post('mode') == 'Add') {
-            $ins = [
-                'client_id' => $this->input->post('client_id'),
-                'project_id' => $this->input->post('project_id'),
-                'task_title' => $this->input->post('task_title'),
-                'task_description' => $this->input->post('task_description'),
-                'priority' => $this->input->post('priority'),
-                'task_status' => $this->input->post('task_status'),
-                'start_date' => $this->input->post('start_date'),
-                'due_date' => $this->input->post('due_date'),
-                'status' => $this->input->post('status'),
-                'created_by' => $this->session->userdata(SESS_HD . 'user_id'),
-                'created_date' => date('Y-m-d H:i:s')
-            ];
-
-            $this->db->insert('tsk_task_info', $ins);
-            redirect('task-list');
-        }
-
-        // Edit Task
-        if ($this->input->post('mode') == 'Edit') {
-            $upd = [
-                'client_id' => $this->input->post('client_id'),
-                'project_id' => $this->input->post('project_id'),
-                'task_title' => $this->input->post('task_title'),
-                'task_description' => $this->input->post('task_description'),
-                'priority' => $this->input->post('priority'),
-                'task_status' => $this->input->post('task_status'),
-                'start_date' => $this->input->post('start_date'),
-                'due_date' => $this->input->post('due_date'),
-                'status' => $this->input->post('status'),
-                'updated_by' => $this->session->userdata(SESS_HD . 'user_id'),
-                'updated_date' => date('Y-m-d H:i:s')
-            ];
-
-            $this->db->where('task_id', $this->input->post('task_id'));
-            $this->db->update('tsk_task_info', $upd);
-            redirect('task-list');
-        }
-
-        $this->load->library('pagination');
-
-        $this->db->where('status !=', 'Delete');
-        $this->db->from('tsk_task_info');
-        $data['total_records'] = $cnt = $this->db->count_all_results();
-
-        $data['sno'] = $this->uri->segment(2, 0);
-
-        $config['base_url'] = site_url('task-list');
-        $config['total_rows'] = $cnt;
-        $config['per_page'] = 20;
-        $config['uri_segment'] = 2;
-        $config['attributes'] = array('class' => 'page-link');
-        $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
-        $config['full_tag_close'] = '</ul>';
-        $config['num_tag_open'] = '<li class="page-item">';
-        $config['num_tag_close'] = '</li>';
-        $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
-        $config['cur_tag_close'] = '</a></li>';
-        $config['prev_tag_open'] = '<li class="page-item">';
-        $config['prev_tag_close'] = '</li>';
-        $config['next_tag_open'] = '<li class="page-item">';
-        $config['next_tag_close'] = '</li>';
-        $config['prev_link'] = "Prev";
-        $config['next_link'] = "Next";
-        $this->pagination->initialize($config);
-
-        $data['client_opt'] = ['' => 'Select Client'];
-
-        $sql = "
-            SELECT 
-                client_id,
-                client_name
-            FROM tsk_clients_info
-            WHERE status = 'Active'
-            ORDER BY client_name ASC
-        ";
-
-        $query = $this->db->query($sql);
-
-        foreach ($query->result_array() as $row) {
-            $data['client_opt'][$row['client_id']] = $row['client_name'];
-        }
-
-        $data['project_opt'] = ['' => 'Select Project'];
-
-        $sql = "
-            SELECT 
-                project_id,
-                project_name
-            FROM tsk_project_info
-            WHERE status != 'Delete'
-            ORDER BY project_name ASC
-        ";
-
-        $query = $this->db->query($sql);
-
-        foreach ($query->result_array() as $row) {
-            $data['project_opt'][$row['project_id']] = $row['project_name'];
-        }
-
-
-        $data['priority_opt'] = [
-            '' => 'Select Priority',
-            'Low' => 'Low',
-            'Medium' => 'Medium',
-            'High' => 'High',
-            'Critical' => 'Critical'
-        ];
-
-        $data['status_opt'] = [
-            '' => 'Select Status',
-            'Pending' => 'Pending',
-            'In Progress' => 'In Progress',
-            'Completed' => 'Completed',
-            'On Hold' => 'On Hold'
-        ];
-
-        // Fetch task list with joins
-        $sql = "
-            SELECT t.*, c.client_name, p.project_name
-            FROM tsk_task_info t
-            LEFT JOIN tsk_clients_info c ON t.client_id = c.client_id
-            LEFT JOIN tsk_project_info p ON t.project_id = p.project_id
-            WHERE t.status != 'Delete'
-            ORDER BY t.task_id DESC 
-            LIMIT " . $this->uri->segment(2, 0) . ", " . $config['per_page'];
-
-        $query = $this->db->query($sql);
-        $data['record_list'] = $query->result_array();
-
-        $data['pagination'] = $this->pagination->create_links();
-
-
-        $this->load->view('page/master/task-list', $data);
+public function task_list()
+{
+    if (!$this->session->userdata(SESS_HD . 'logged_in')) {
+        redirect();
     }
+
+    if ($this->session->userdata(SESS_HD . 'level') != 'Admin' && 
+        $this->session->userdata(SESS_HD . 'level') != 'Staff') {
+        echo "<h3 style='color:red;'>Permission Denied</h3>";
+        exit;
+    }
+
+    // FIX: Load text helper for character_limiter / word_limiter
+    $this->load->helper('text');
+
+    $data['js'] = 'task-list.inc';
+
+    /* ===================== ADD TASK ===================== */
+    if ($this->input->post('mode') == 'Add') {
+        $this->db->trans_start();
+
+        $ins = array(
+            'client_id'         => $this->input->post('client_id'),
+            'project_id'        => $this->input->post('project_id'),
+            'task_title'        => $this->input->post('task_title'),
+            'task_description'  => $this->input->post('task_description'),
+            'priority'          => $this->input->post('priority'),
+            'task_status'       => $this->input->post('task_status'),
+            'start_date'        => $this->input->post('start_date') ?: null,
+            'due_date'          => $this->input->post('due_date') ?: null,
+            'status'            => 'Active',
+            'created_by'        => $this->session->userdata(SESS_HD . 'user_id'),
+            'created_date'      => date('Y-m-d H:i:s'),
+        );
+
+        $this->db->insert('tsk_task_info', $ins);
+        $task_id = $this->db->insert_id();
+
+        $assigned_to = $this->input->post('assigned_to');
+        if (is_array($assigned_to) && count($assigned_to) > 0) {
+            foreach ($assigned_to as $employee_id) {
+                $assign_ins = array(
+                    'task_id'       => $task_id,
+                    'assigning_id'  => $this->session->userdata(SESS_HD . 'user_id'),
+                    'assigned_to'   => $employee_id,
+                    'status'        => 'Active',
+                    'created_by'    => $this->session->userdata(SESS_HD . 'user_id'),
+                    'created_date'  => date('Y-m-d H:i:s'),
+                );
+                $this->db->insert('tsk_assign_info', $assign_ins);
+            }
+        }
+
+        $this->db->trans_complete();
+        redirect('task-list/');
+    }
+
+    /* ===================== EDIT TASK ===================== */
+    if ($this->input->post('mode') == 'Edit') {
+        $task_id = $this->input->post('task_id');
+
+        $this->db->trans_start();
+
+        $upd = array(
+            'client_id'         => $this->input->post('client_id'),
+            'project_id'        => $this->input->post('project_id'),
+            'task_title'        => $this->input->post('task_title'),
+            'task_description'  => $this->input->post('task_description'),
+            'priority'          => $this->input->post('priority'),
+            'task_status'       => $this->input->post('task_status'),
+            'start_date'        => $this->input->post('start_date') ?: null,
+            'due_date'          => $this->input->post('due_date') ?: null,
+            'updated_by'        => $this->session->userdata(SESS_HD . 'user_id'),
+            'updated_date'      => date('Y-m-d H:i:s'),
+        );
+
+        $this->db->where('task_id', $task_id);
+        $this->db->update('tsk_task_info', $upd);
+
+        // Delete old assignments
+        $this->db->where('task_id', $task_id)->delete('tsk_assign_info');
+
+        // Insert new assignments
+        $assigned_to = $this->input->post('assigned_to');
+        if (is_array($assigned_to) && count($assigned_to) > 0) {
+            foreach ($assigned_to as $employee_id) {
+                $assign_ins = array(
+                    'task_id'       => $task_id,
+                    'assigning_id'  => $this->session->userdata(SESS_HD . 'user_id'),
+                    'assigned_to'   => $employee_id,
+                    'status'        => 'Active',
+                    'created_by'    => $this->session->userdata(SESS_HD . 'user_id'),
+                    'created_date'  => date('Y-m-d H:i:s'),
+                );
+                $this->db->insert('tsk_assign_info', $assign_ins);
+            }
+        }
+
+        $this->db->trans_complete();
+        redirect('task-list/');
+    }
+
+    $this->load->library('pagination');
+
+    $this->db->where('t.status !=', 'Delete');
+    $this->db->from('tsk_task_info t');
+    $data['total_records'] = $cnt = $this->db->count_all_results();
+
+    $config['base_url'] = site_url('task-list');
+    $config['total_rows'] = $cnt;
+    $config['per_page'] = 20;
+    $config['uri_segment'] = 2;
+    $config['attributes'] = array('class' => 'page-link');
+    $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
+    $config['full_tag_close'] = '</ul>';
+    $config['num_tag_open'] = '<li class="page-item">';
+    $config['num_tag_close'] = '</li>';
+    $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
+    $config['cur_tag_close'] = '</a></li>';
+    $config['prev_tag_open'] = '<li class="page-item">';
+    $config['prev_tag_close'] = '</li>';
+    $config['next_tag_open'] = '<li class="page-item">';
+    $config['next_tag_close'] = '</li>';
+    $config['prev_link'] = "Prev";
+    $config['next_link'] = "Next";
+    $this->pagination->initialize($config);
+
+    // Dropdowns
+    $data['client_opt'] = ['' => 'Select Client'];
+    $clients = $this->db->where('status !=', 'Delete')->order_by('client_name')->get('tsk_clients_info')->result_array();
+    foreach ($clients as $c) $data['client_opt'][$c['client_id']] = $c['client_name'];
+
+    $data['project_opt'] = ['' => 'Select Project'];
+    $projects = $this->db->where('status !=', 'Delete')->order_by('project_name')->get('tsk_project_info')->result_array();
+    foreach ($projects as $p) $data['project_opt'][$p['project_id']] = $p['project_name'];
+
+    // FIX: Correct employee table and fields
+    $data['employees'] = $this->db->select('employee_id, employee_name')
+                                  ->where('status', 'Active')
+                                  ->order_by('employee_name')
+                                  ->get('tsk_employee_info')
+                                  ->result_array();
+
+    // Task List Query
+    $sql = "
+        SELECT 
+            t.*,
+            c.client_name,
+            p.project_name,
+            GROUP_CONCAT(e.employee_name ORDER BY e.employee_name SEPARATOR ', ') AS assigned_employees
+        FROM tsk_task_info t
+        LEFT JOIN tsk_clients_info c ON t.client_id = c.client_id
+        LEFT JOIN tsk_project_info p ON t.project_id = p.project_id
+        LEFT JOIN tsk_assign_info a ON t.task_id = a.task_id AND a.status = 'Active'
+        LEFT JOIN tsk_employee_info e ON a.assigned_to = e.employee_id
+        WHERE t.status != 'Delete'
+        GROUP BY t.task_id
+        ORDER BY t.due_date ASC, t.priority DESC, t.task_id DESC
+        LIMIT " . $this->uri->segment(2, 0) . ", " . $config['per_page'];
+
+    $data['record_list'] = $this->db->query($sql)->result_array();
+    $data['pagination'] = $this->pagination->create_links();
+
+    $this->load->view('page/master/task-list', $data);
+}
 
 
 

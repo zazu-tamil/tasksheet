@@ -1,44 +1,42 @@
 <script>
-  jQuery(function ($) {
+jQuery(function($) {
+ 
+
     // Edit Task
-    $(document).on("click", ".edit_record", function () {
-      let id = $(this).val();
+    $(document).on('click', '.edit_record', function() {
+        var task_id = $(this).val();
 
-      $.ajax({
-        url: "<?= site_url('get-data') ?>", // You need a generic get-data method or create one
-        type: "POST",
-        data: { tbl: "tsk_task_info", id: id },
-        dataType: "json",
-        success: function (d) {
-          $("#edit_modal #task_id").val(d.task_id);
-          $("#edit_modal #client_id").val(d.client_id);
-          $("#edit_modal #project_id").val(d.project_id);
-          $("#edit_modal #task_title").val(d.task_title);
-          $("#edit_modal #task_description").val(d.task_description);
-          $("#edit_modal #priority").val(d.priority);
-          $("#edit_modal #task_status").val(d.task_status);
-          $("#edit_modal #start_date").val(d.start_date);
-          $("#edit_modal #due_date").val(d.due_date);
+        $.post('<?= site_url("get-data") ?>', { tbl: 'tsk_task_info', id: task_id }, function(task) {
+            $('#task_id').val(task.task_id);
+            $('#client_id').val(task.client_id);
+            $('#project_id').val(task.project_id);
+            $('#task_title').val(task.task_title);
+            $('#task_description').val(task.task_description);
+            $('#priority').val(task.priority);
+            $('#task_status').val(task.task_status);
+            $('#start_date').val(task.start_date);
+            $('#due_date').val(task.due_date);
 
-          $("#edit_modal").modal("show");
-        },
-      });
+            $.post('<?= site_url("get-task-assignments") ?>', { task_id: task_id }, function(emps) {
+                var selected = emps.map(function(e) { return e.assigned_to; });
+                $('#assigned_to').val(selected);
+            }, 'json');
+
+            $('#modal_title').text('Edit Task');
+            $('#form_mode').val('Edit');
+            $('#submit_btn').text('Update Task');
+            $('#task_modal').modal('show');
+        }, 'json');
     });
 
-    // Delete Task
-    $(document).on("click", ".del_record", function () {
-      let id = $(this).val();
-      if (confirm("Are you sure you want to delete this task?")) {
-        $.ajax({
-          url: "<?= site_url('delete-record') ?>",
-          type: "POST",
-          data: { tbl: "tsk_task_info", id: id },
-          success: function (msg) {
-            alert(msg);
-            location.reload();
-          },
-        });
-      }
+    // Delete
+    $(document).on('click', '.del_record', function() {
+        if (confirm('Are you sure you want to delete this task?')) {
+            $.post('<?= site_url("delete-record") ?>', { tbl: 'tsk_task_info', id: $(this).val() }, function(msg) {
+                alert(msg);
+                location.reload();
+            });
+        }
     });
-  });
+});
 </script>
