@@ -70,13 +70,19 @@ CREATE TABLE tsk_task_info (
     updated_date DATETIME DEFAULT NULL
 );
 
+ 
+    ALTER TABLE `tsk_task_info` ADD `status` VARCHAR(50) NULL AFTER `due_date`;
+
 CREATE TABLE tsk_assign_info (
     assign_id INT AUTO_INCREMENT PRIMARY KEY,
     task_id INT NOT NULL,           -- Task reference
     assigning_id INT NOT NULL,      -- Who assigned the task
     assigned_to INT NOT NULL,       -- Employee assigned
     status VARCHAR(50) DEFAULT 'Active',   -- Assignment status
-    assigned_date DATETIME NOT NULL
+    created_by INT NOT NULL,
+    created_date DATETIME NOT NULL,
+    updated_by INT DEFAULT NULL,
+    updated_date DATETIME DEFAULT NULL
 );
 
 

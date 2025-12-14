@@ -1,389 +1,360 @@
 <?php include_once(VIEWPATH . '/inc/header.php'); ?>
 
+<!-- AdminLTE 2 Enhanced Dashboard -->
+<section class="content-header">
+    <h1>
+        <i class="fa fa-dashboard"></i> Dashboard
+        <small>Control Panel Overview</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+    </ol>
+</section>
+
+<section class="content">
+    <!-- Stats Cards Row -->
+    <div class="row">
+        <?php
+        $cards = [
+            ['title' => 'TOTAL TASKS', 'icon' => 'fa-tasks', 'color' => 'aqua-active', 'value' => $total_tasks ?? 0, 'trend' => '+12%'],
+            ['title' => "TODAY'S TASKS", 'icon' => 'fa-calendar', 'color' => 'light-blue-active', 'value' => $today_tasks ?? 0, 'trend' => '+8%'],
+            ['title' => 'PENDING TASKS', 'icon' => 'fa-clock-o', 'color' => 'yellow-active', 'value' => $pending_tasks ?? 0, 'trend' => '−2%'],
+            ['title' => 'COMPLETED', 'icon' => 'fa-check-circle', 'color' => 'green-active', 'value' => $completed_tasks ?? 0, 'trend' => '+25%'],
+            ['title' => 'CLIENTS', 'icon' => 'fa-users', 'color' => 'red-active', 'value' => $client_count ?? 0, 'trend' => '+15%'],
+            ['title' => 'PROJECTS', 'icon' => 'fa-cubes', 'color' => 'purple-active', 'value' => $project_count ?? 0, 'trend' => '+10%'],
+            ['title' => 'EMPLOYEES', 'icon' => 'fa-user', 'color' => 'navy-active', 'value' => $employee_count ?? 0, 'trend' => '+5%'],
+            ['title' => 'DUE 30MIN', 'icon' => 'fa-bell-o', 'color' => 'orange-active', 'value' => $due_30min ?? 0, 'trend' => '!'],
+        ];
+
+        foreach ($cards as $c): ?>
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-<?php echo $c['color']; ?>">
+                    <div class="inner">
+                        <h3><?php echo $c['value']; ?></h3>
+                        <p><?php echo $c['title']; ?></p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa <?php echo $c['icon']; ?>"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                        <?php echo $c['trend']; ?> <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- Charts & Info Row -->
+    <div class="row">
+        <!-- Tasks Chart -->
+        <div class="col-md-8">
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Tasks Overview <small class="text-muted">(This Month)</small></h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <canvas id="tasksChart" style="height: 200px;"></canvas>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-aqua"><i class="fa fa-tasks"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Total Tasks</span>
+                                    <span class="info-box-number"><?php echo $total_tasks ?? 0; ?></span>
+                                </div>
+                            </div>
+                            <div class="info-box">
+                                <span class="info-box-icon bg-yellow"><i class="fa fa-clock-o"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Pending</span>
+                                    <span class="info-box-number"><?php echo $pending_tasks ?? 0; ?></span>
+                                </div>
+                            </div>
+                            <div class="info-box">
+                                <span class="info-box-icon bg-green"><i class="fa fa-check-circle"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Completed</span>
+                                    <span class="info-box-number"><?php echo $completed_tasks ?? 0; ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects Chart -->
+        <div class="col-md-4">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Projects Status</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <canvas id="projectsChart" style="height: 250px;"></canvas>
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <small class="text-info">Total: <?php echo $project_count ?? 0; ?></small>
+                        </div>
+                        <div class="col-sm-6 text-right">
+                            <small class="text-success">Completed: <?php echo $completed_tasks ?? 0; ?></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Quick Stats -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Recent Activity</h3>
+                </div>
+                <div class="box-body">
+                    <ul class="timeline">
+                        <li>
+                            <i class="fa fa-check-circle bg-green"></i>
+                            <div class="timeline-item">
+                                <span class="time"><i class="fa fa-clock-o"></i> 12 mins ago</span>
+                                <h3 class="timeline-header">Task #1234 Completed</h3>
+                                <div class="timeline-body">Project delivery completed successfully</div>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa fa-user bg-aqua"></i>
+                            <div class="timeline-item">
+                                <span class="time"><i class="fa fa-clock-o"></i> 2 hours ago</span>
+                                <h3 class="timeline-header">New Client Added</h3>
+                                <div class="timeline-body">ABC Corp registered successfully</div>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa fa-comments bg-yellow"></i>
+                            <div class="timeline-item">
+                                <span class="time"><i class="fa fa-clock-o"></i> 5 hours ago</span>
+                                <h3 class="timeline-header">New Comments</h3>
+                                <div class="timeline-body">5 new comments on Project X</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="box box-danger">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Quick Stats</h3>
+                </div>
+                <div class="box-body no-padding">
+                    <table class="table table-condensed">
+                        <tr>
+                            <td><span class="label label-success">Due Today</span></td>
+                            <td><span class="badge bg-green"><?php echo $today_tasks ?? 0; ?></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="label label-warning">Overdue</span></td>
+                            <td><span class="badge bg-orange"><?php echo $due_30min ?? 0; ?></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="label label-info">Active Projects</span></td>
+                            <td><span class="badge bg-aqua"><?php echo $project_count ?? 0; ?></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="label label-primary">Team Members</span></td>
+                            <td><span class="badge bg-light-blue"><?php echo $employee_count ?? 0; ?></span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php include_once(VIEWPATH . '/inc/footer.php'); ?>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Enhanced Tasks Doughnut Chart
+    const tasksCtx = document.getElementById('tasksChart').getContext('2d');
+    new Chart(tasksCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pending', 'In Progress', 'Completed'],
+            datasets: [{
+                data: [<?php echo $pending_tasks ?? 0; ?>, <?php echo ($today_tasks ?? 0) - ($pending_tasks ?? 0); ?>, <?php echo $completed_tasks ?? 0; ?>],
+                backgroundColor: ['#f39c12', '#3498db', '#2ecc71'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Enhanced Projects Bar Chart
+    const projectsCtx = document.getElementById('projectsChart').getContext('2d');
+    new Chart(projectsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Total', 'Active', 'Completed'],
+            datasets: [{
+                label: 'Projects',
+                data: [<?php echo $project_count ?? 0; ?>, <?php echo ($project_count ?? 0) - ($completed_tasks ?? 0); ?>, <?php echo $completed_tasks ?? 0; ?>],
+                backgroundColor: ['#3498db', '#f39c12', '#2ecc71'],
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
 <style>
-    :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        --card-shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.15);
-    }
-
-    .dashboard-header {
-        background: var(--primary-gradient);
-        padding: 40px 30px;
-        border-radius: 15px;
-        margin-bottom: 30px;
-        box-shadow: var(--card-shadow);
+    /* AdminLTE 2 Dashboard Enhancements */
+    .small-box {
+        border-radius: 10px;
         position: relative;
         overflow: hidden;
     }
 
-    .dashboard-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 400px;
-        height: 400px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
-
-    .dashboard-header h1 {
-        color: #fff;
-        margin: 0;
-        font-size: 32px;
-        font-weight: 700;
-        position: relative;
-        z-index: 1;
-    }
-
-    .dashboard-header .subtitle {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 16px;
-        margin-top: 8px;
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Modern Stats Cards */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 25px;
-        margin-bottom: 30px;
-    }
-
-    .stat-card {
-        background: #fff;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: var(--card-shadow);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .stat-card::before {
+    .small-box::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
+        right: 0;
         height: 4px;
-        background: var(--card-color);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shimmer 2s infinite;
     }
 
-    .stat-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--card-shadow-hover);
+    @keyframes shimmer {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
     }
 
-    .stat-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 20px;
+    .small-box .icon {
+        font-size: 50px;
+        opacity: 0.9;
     }
 
-    .stat-icon {
-        width: 60px;
-        height: 60px;
+    .small-box-footer {
+        background: rgba(0, 0, 0, 0.1);
+        border-top: none;
+        padding: 10px 15px;
+        font-weight: 600;
+    }
+
+    /* Box Enhancements */
+    .box {
         border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 28px;
-        color: #fff;
-        background: var(--card-color);
-        box-shadow: 0 4px 12px var(--card-shadow-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border: none;
     }
 
-    .stat-info {
-        flex: 1;
-        padding-left: 20px;
+    .box.box-success {
+        border-left: 5px solid #00a65a;
     }
 
-    .stat-value {
-        font-size: 36px;
-        font-weight: 700;
-        color: #2d3748;
-        line-height: 1;
-        margin-bottom: 8px;
+    .box.box-primary {
+        border-left: 5px solid #3c8dbc;
     }
 
-    .stat-label {
-        font-size: 15px;
-        color: #718096;
-        font-weight: 500;
-        /* text-transform: uppercase; */
-        letter-spacing: 0.5px;
+    .box.box-info {
+        border-left: 5px solid #00c0ef;
     }
 
-    .stat-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 15px;
-        border-top: 1px solid #e2e8f0;
+    .box.box-danger {
+        border-left: 5px solid #dd4b39;
     }
 
-    .stat-link {
-        color: var(--card-color);
-        font-size: 14px;
-        font-weight: 600;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        transition: all 0.3s ease;
+    .timeline {
+        position: relative;
+        margin: 0;
     }
 
-    .stat-link:hover {
-        color: var(--card-color);
-        transform: translateX(5px);
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #eee;
+        left: 20px;
+        margin-left: -5px;
     }
 
-    .stat-link i {
-        margin-left: 8px;
-        font-size: 12px;
-    }
-
-    /* Color Variations */
-    .stat-card.aqua {
-        --card-color: #00c0ef;
-        --card-shadow-color: rgba(0, 192, 239, 0.3);
-    }
-
-    .stat-card.green {
-        --card-color: #00a65a;
-        --card-shadow-color: rgba(0, 166, 90, 0.3);
-    }
-
-    .stat-card.yellow {
-        --card-color: #f39c12;
-        --card-shadow-color: rgba(243, 156, 18, 0.3);
-    }
-
-    .stat-card.red {
-        --card-color: #dd4b39;
-        --card-shadow-color: rgba(221, 75, 57, 0.3);
-    }
-
-    .stat-card.purple {
-        --card-color: #605ca8;
-        --card-shadow-color: rgba(96, 92, 168, 0.3);
-    }
-
-    .stat-card.maroon {
-        --card-color: #d81b60;
-        --card-shadow-color: rgba(216, 27, 96, 0.3);
-    }
-
-    .stat-card.orange {
-        --card-color: #ff6b6b;
-        --card-shadow-color: rgba(255, 107, 107, 0.3);
-    }
-
-    .stat-card.teal {
-        --card-color: #26a69a;
-        --card-shadow-color: rgba(38, 166, 154, 0.3);
-    }
-
-    .stat-card.indigo {
-        --card-color: #5c6bc0;
-        --card-shadow-color: rgba(92, 107, 192, 0.3);
-    }
-
-    .stat-card.gradient {
-        --card-color: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        --card-shadow-color: rgba(240, 147, 251, 0.3);
-    }
-
-    .stat-card.gradient .stat-icon {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    .stat-card.gradient .stat-link {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    /* System Status Card */
-    .system-status {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: #fff;
-    }
-
-    .system-status .stat-value,
-    .system-status .stat-label {
-        color: #fff;
-    }
-
-    .system-status .stat-footer {
-        border-top-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .system-status .stat-link {
-        color: #fff;
-    }
-
-    /* Quick Stats Section */
-    .quick-stats {
+    .timeline>li>.timeline-item {
+        margin-top: 0;
+        border-radius: 8px;
         background: #fff;
-        border-radius: 15px;
-        padding: 30px;
-        box-shadow: var(--card-shadow);
-        margin-top: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .quick-stats h3 {
-        font-size: 22px;
-        font-weight: 700;
-        color: #2d3748;
-        margin-bottom: 25px;
-        display: flex;
-        align-items: center;
+    .content-wrapper {
+        min-height: 100% !important;
+        background-color: #e3e4e5 !important;
+        z-index: 800 !important;
     }
 
-    .quick-stats h3 i {
-        margin-right: 12px;
-        color: #667eea;
-    }
-
-    .stats-summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 20px;
-    }
-
-    .summary-item {
-        text-align: center;
-        padding: 20px;
-        border-radius: 10px;
-        background: #f7fafc;
-        transition: all 0.3s ease;
-    }
-
-    .summary-item:hover {
-        background: #edf2f7;
-        transform: scale(1.05);
-    }
-
-    .summary-item i {
-        font-size: 36px;
-        margin-bottom: 12px;
-        display: block;
-    }
-
-    .summary-item .value {
-        font-size: 28px;
-        font-weight: 700;
-        color: #2d3748;
-        margin-bottom: 5px;
-    }
-
-    .summary-item .label {
-        font-size: 13px;
-        color: #718096;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    /* Responsive Design */
+    /* Perfect Responsive */
     @media (max-width: 768px) {
-        .dashboard-header {
-            padding: 30px 20px;
+        .small-box h3 {
+            font-size: 2.2rem;
         }
 
-        .dashboard-header h1 {
-            font-size: 24px;
+        .timeline::before {
+            left: 15px;
         }
 
-        .stats-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .stat-card-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .stat-info {
-            padding-left: 0;
-            padding-top: 15px;
-        }
-
-        .stat-value {
-            font-size: 28px;
+        .box-header .box-tools {
+            margin-top: 5px;
         }
     }
 
-    /* Animation */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+    @media (max-width: 480px) {
+        .content-header h1 {
+            font-size: 1.5rem;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        .small-box {
+            margin-bottom: 15px;
         }
-    }
-
-    .stat-card {
-        animation: fadeInUp 0.6s ease-out;
-    }
-
-    .stat-card:nth-child(1) {
-        animation-delay: 0.1s;
-    }
-
-    .stat-card:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .stat-card:nth-child(3) {
-        animation-delay: 0.3s;
-    }
-
-    .stat-card:nth-child(4) {
-        animation-delay: 0.4s;
-    }
-
-    .stat-card:nth-child(5) {
-        animation-delay: 0.5s;
-    }
-
-    .stat-card:nth-child(6) {
-        animation-delay: 0.6s;
-    }
-
-    .stat-card:nth-child(7) {
-        animation-delay: 0.7s;
-    }
-
-    .stat-card:nth-child(8) {
-        animation-delay: 0.8s;
-    }
-
-    .stat-card:nth-child(9) {
-        animation-delay: 0.9s;
     }
 </style>
-
-<section class="content">
-    <!-- Modern Header -->
-    <div class="dashboard-header">
-        <h1><i class="fa fa-dashboard"></i> Dashboard</h1>
-        <div class="subtitle">Welcome back! Here's what's happening with your store today.</div>
-    </div>
- 
-
-</section>
-
-<?php include_once(VIEWPATH . 'inc/footer.php'); ?>
- 

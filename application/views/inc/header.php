@@ -1,4 +1,4 @@
-<?php 
+<?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <!DOCTYPE html>
@@ -7,7 +7,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?php echo PG_HEAD; if(isset($title)) echo " - " . $title; ?></title>
+    <title><?php echo PG_HEAD;
+    if (isset($title))
+        echo " - " . $title; ?></title>
     <link rel="icon" type="image/png" sizes="32x32" href="<?php echo base_url() ?>/asset/images/icon-cce.png">
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -54,18 +56,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <!-- Logo -->
             <a href="" class="logo">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
-                <span class=" logo-mini"> 
+                <span class=" logo-mini">
                     <!-- <img
                         src="<?php echo base_url() ?>/asset/images/Classwall-Logo-SM.png"
-                        class="img-circle img-responsive" alt="<?php echo PG_HEAD;?>"> -->
-                        <?php echo PG_HEAD; ?>
+                        class="img-circle img-responsive" alt="<?php echo PG_HEAD; ?>"> -->
+                    <?php echo PG_HEAD; ?>
                 </span>
                 <!-- logo for regular state and mobile devices -->
                 <span class="logo-lg"><?php echo PG_HEAD; ?></span>
                 <!-- <div class="logo-lg" style="background-color:#f4f4f4;border-radius:0px; ">
                     <img
                         src="<?php echo base_url() ?>/asset/images/Classwall-H.png" class="img-rounded img-responsive"
-                        alt="<?php echo PG_HEAD;?>"></div> -->
+                        alt="<?php echo PG_HEAD; ?>"></div> -->
             </a>
             <!-- Header Navbar: style can be found in header.less -->
             <nav class="navbar navbar-static-top">
@@ -88,7 +90,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <img src="<?php echo base_url() ?>asset/images/user.jpg" class="user-image"
                                     alt="User Image">
                                 <span
-                                    class="hidden-xs"><?php echo strtoupper($this->session->userdata(SESS_HD . 'staff_name')) ;?></span>
+                                    class="hidden-xs"><?php echo strtoupper($this->session->userdata(SESS_HD . 'staff_name')); ?></span>
                             </a>
                             <ul class="dropdown-menu">
                                 <!-- User image -->
@@ -97,26 +99,26 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         alt="User Image">
 
                                     <p>
-                                        <?php echo strtoupper($this->session->userdata(SESS_HD . 'staff_name')) ;?>
-                                        <small><?php echo date('d-M-Y')?></small>
+                                        <?php echo strtoupper($this->session->userdata(SESS_HD . 'staff_name')); ?>
+                                        <small><?php echo date('d-M-Y') ?></small>
                                     </p>
                                 </li>
                                 <!-- Menu Body -->
                                 <?php /*
-                                <li class="user-body">
-                                  <div class="row">
-                                    <div class="col-xs-4 text-center">
-                                      <a href="#">Followers</a>
-                                    </div>
-                                    <div class="col-xs-4 text-center">
-                                      <a href="#">Sales</a>
-                                    </div>
-                                    <div class="col-xs-4 text-center">
-                                      <a href="#">Friends</a>
-                                    </div>
-                                  </div>
-                                  <!-- /.row -->
-                                </li> */ ?>
+            <li class="user-body">
+              <div class="row">
+                <div class="col-xs-4 text-center">
+                  <a href="#">Followers</a>
+                </div>
+                <div class="col-xs-4 text-center">
+                  <a href="#">Sales</a>
+                </div>
+                <div class="col-xs-4 text-center">
+                  <a href="#">Friends</a>
+                </div>
+              </div>
+              <!-- /.row -->
+            </li> */ ?>
                                 <!-- Menu Footer-->
                                 <li class="user-footer">
                                     <div class="pull-left hide">
@@ -138,7 +140,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </div>
             </nav>
         </header>
-        <?php  include_once('left-menu.php'); ?>
+        <?php include_once('left-menu.php'); ?>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <div id="zazualert"></div>
