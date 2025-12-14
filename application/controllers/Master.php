@@ -304,7 +304,9 @@ class Master extends CI_Controller
         }
 
         $data['project_status_opt'] = array(
-            'Pending' => 'Pending', 'In Progress' => 'In Progress', 'Completed' => 'Completed'
+            'Pending' => 'Pending',
+            'In Progress' => 'In Progress',
+            'Completed' => 'Completed'
         );
 
 
@@ -326,73 +328,73 @@ class Master extends CI_Controller
     }
 
     public function emp_category_list()
-{
-    if (!$this->session->userdata(SESS_HD . 'logged_in')) {
-        redirect();
-    }
+    {
+        if (!$this->session->userdata(SESS_HD . 'logged_in')) {
+            redirect();
+        }
 
-    if (
-        $this->session->userdata(SESS_HD . 'level') != 'Admin'
-        && $this->session->userdata(SESS_HD . 'level') != 'Staff'
-    ) {
-        echo "<h3 style='color:red;'>Permission Denied</h3>";
-        exit;
-    }
+        if (
+            $this->session->userdata(SESS_HD . 'level') != 'Admin'
+            && $this->session->userdata(SESS_HD . 'level') != 'Staff'
+        ) {
+            echo "<h3 style='color:red;'>Permission Denied</h3>";
+            exit;
+        }
 
-    $data['js'] = 'emp-category-list.inc';
+        $data['js'] = 'emp-category-list.inc';
 
-    /* ===================== ADD ===================== */
-    if ($this->input->post('mode') == 'Add') {
-        $ins = array(
-            'emp_category_name' => $this->input->post('emp_category_name'),
-            'emp_category_code' => strtoupper($this->input->post('emp_category_code')),
-            'status'            => $this->input->post('status'),
-        );
-        $this->db->insert('tsk_emp_category_info', $ins);
-        redirect('emp-category-list/');
-    }
+        /* ===================== ADD ===================== */
+        if ($this->input->post('mode') == 'Add') {
+            $ins = array(
+                'emp_category_name' => $this->input->post('emp_category_name'),
+                'emp_category_code' => strtoupper($this->input->post('emp_category_code')),
+                'status' => $this->input->post('status'),
+            );
+            $this->db->insert('tsk_emp_category_info', $ins);
+            redirect('emp-category-list/');
+        }
 
-    /* ===================== EDIT ===================== */
-    if ($this->input->post('mode') == 'Edit') {
-        $upd = array(
-            'emp_category_name' => $this->input->post('emp_category_name'),
-            'emp_category_code' => strtoupper($this->input->post('emp_category_code')),
-            'status'            => $this->input->post('status'),
-        );
-        $this->db->where('emp_category_id', $this->input->post('emp_category_id'));
-        $this->db->update('tsk_emp_category_info', $upd);
+        /* ===================== EDIT ===================== */
+        if ($this->input->post('mode') == 'Edit') {
+            $upd = array(
+                'emp_category_name' => $this->input->post('emp_category_name'),
+                'emp_category_code' => strtoupper($this->input->post('emp_category_code')),
+                'status' => $this->input->post('status'),
+            );
+            $this->db->where('emp_category_id', $this->input->post('emp_category_id'));
+            $this->db->update('tsk_emp_category_info', $upd);
 
-        redirect('emp-category-list/');
-    }
+            redirect('emp-category-list/');
+        }
 
-    $this->load->library('pagination');
+        $this->load->library('pagination');
 
-    $this->db->where('status != ', 'Delete');
-    $this->db->from('tsk_emp_category_info');
-    $data['total_records'] = $cnt = $this->db->count_all_results();
+        $this->db->where('status != ', 'Delete');
+        $this->db->from('tsk_emp_category_info');
+        $data['total_records'] = $cnt = $this->db->count_all_results();
 
-    $data['sno'] = $this->uri->segment(2, 0);
+        $data['sno'] = $this->uri->segment(2, 0);
 
-    $config['base_url'] = site_url('emp-category-list');
-    $config['total_rows'] = $cnt;
-    $config['per_page'] = 20;
-    $config['uri_segment'] = 2;
-    $config['attributes'] = array('class' => 'page-link');
-    $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
-    $config['full_tag_close'] = '</ul>';
-    $config['num_tag_open'] = '<li class="page-item">';
-    $config['num_tag_close'] = '</li>';
-    $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
-    $config['cur_tag_close'] = '</a></li>';
-    $config['prev_tag_open'] = '<li class="page-item">';
-    $config['prev_tag_close'] = '</li>';
-    $config['next_tag_open'] = '<li class="page-item">';
-    $config['next_tag_close'] = '</li>';
-    $config['prev_link'] = "Prev";
-    $config['next_link'] = "Next";
-    $this->pagination->initialize($config);
+        $config['base_url'] = site_url('emp-category-list');
+        $config['total_rows'] = $cnt;
+        $config['per_page'] = 20;
+        $config['uri_segment'] = 2;
+        $config['attributes'] = array('class' => 'page-link');
+        $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
+        $config['full_tag_close'] = '</ul>';
+        $config['num_tag_open'] = '<li class="page-item">';
+        $config['num_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['prev_tag_open'] = '<li class="page-item">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_tag_open'] = '<li class="page-item">';
+        $config['next_tag_close'] = '</li>';
+        $config['prev_link'] = "Prev";
+        $config['next_link'] = "Next";
+        $this->pagination->initialize($config);
 
-    $sql = "
+        $sql = "
         SELECT * 
         FROM tsk_emp_category_info 
         WHERE status != 'Delete'
@@ -400,80 +402,80 @@ class Master extends CI_Controller
         LIMIT " . $this->uri->segment(2, 0) . "," . $config['per_page'] . "
     ";
 
-    $query = $this->db->query($sql);
-    $data['record_list'] = $query->result_array();
+        $query = $this->db->query($sql);
+        $data['record_list'] = $query->result_array();
 
-    $data['pagination'] = $this->pagination->create_links();
+        $data['pagination'] = $this->pagination->create_links();
 
-    $this->load->view('page/master/emp-category-list', $data);
-}
-
-public function emp_type_list()
-{
-    if (!$this->session->userdata(SESS_HD . 'logged_in')) {
-        redirect();
+        $this->load->view('page/master/emp-category-list', $data);
     }
 
-    if (
-        $this->session->userdata(SESS_HD . 'level') != 'Admin'
-        && $this->session->userdata(SESS_HD . 'level') != 'Staff'
-    ) {
-        echo "<h3 style='color:red;'>Permission Denied</h3>";
-        exit;
-    }
+    public function emp_type_list()
+    {
+        if (!$this->session->userdata(SESS_HD . 'logged_in')) {
+            redirect();
+        }
 
-    $data['js'] = 'emp-type-list.inc';
+        if (
+            $this->session->userdata(SESS_HD . 'level') != 'Admin'
+            && $this->session->userdata(SESS_HD . 'level') != 'Staff'
+        ) {
+            echo "<h3 style='color:red;'>Permission Denied</h3>";
+            exit;
+        }
 
-    /* ===================== ADD ===================== */
-    if ($this->input->post('mode') == 'Add') {
-        $ins = array(
-            'emp_type_name' => $this->input->post('emp_type_name'),
-            'status'        => $this->input->post('status'),
-        );
-        $this->db->insert('tsk_emp_type_info', $ins);
-        redirect('emp-type-list/');
-    }
+        $data['js'] = 'emp-type-list.inc';
 
-    /* ===================== EDIT ===================== */
-    if ($this->input->post('mode') == 'Edit') {
-        $upd = array(
-            'emp_type_name' => $this->input->post('emp_type_name'),
-            'status'        => $this->input->post('status'),
-        );
-        $this->db->where('emp_type_id', $this->input->post('emp_type_id'));
-        $this->db->update('tsk_emp_type_info', $upd);
+        /* ===================== ADD ===================== */
+        if ($this->input->post('mode') == 'Add') {
+            $ins = array(
+                'emp_type_name' => $this->input->post('emp_type_name'),
+                'status' => $this->input->post('status'),
+            );
+            $this->db->insert('tsk_emp_type_info', $ins);
+            redirect('emp-type-list/');
+        }
 
-        redirect('emp-type-list/');
-    }
+        /* ===================== EDIT ===================== */
+        if ($this->input->post('mode') == 'Edit') {
+            $upd = array(
+                'emp_type_name' => $this->input->post('emp_type_name'),
+                'status' => $this->input->post('status'),
+            );
+            $this->db->where('emp_type_id', $this->input->post('emp_type_id'));
+            $this->db->update('tsk_emp_type_info', $upd);
 
-    $this->load->library('pagination');
+            redirect('emp-type-list/');
+        }
 
-    $this->db->where('status != ', 'Delete');
-    $this->db->from('tsk_emp_type_info');
-    $data['total_records'] = $cnt = $this->db->count_all_results();
+        $this->load->library('pagination');
 
-    $data['sno'] = $this->uri->segment(2, 0);
+        $this->db->where('status != ', 'Delete');
+        $this->db->from('tsk_emp_type_info');
+        $data['total_records'] = $cnt = $this->db->count_all_results();
 
-    $config['base_url'] = site_url('emp-type-list');
-    $config['total_rows'] = $cnt;
-    $config['per_page'] = 20;
-    $config['uri_segment'] = 2;
-    $config['attributes'] = array('class' => 'page-link');
-    $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
-    $config['full_tag_close'] = '</ul>';
-    $config['num_tag_open'] = '<li class="page-item">';
-    $config['num_tag_close'] = '</li>';
-    $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
-    $config['cur_tag_close'] = '</a></li>';
-    $config['prev_tag_open'] = '<li class="page-item">';
-    $config['prev_tag_close'] = '</li>';
-    $config['next_tag_open'] = '<li class="page-item">';
-    $config['next_tag_close'] = '</li>';
-    $config['prev_link'] = "Prev";
-    $config['next_link'] = "Next";
-    $this->pagination->initialize($config);
+        $data['sno'] = $this->uri->segment(2, 0);
 
-    $sql = "
+        $config['base_url'] = site_url('emp-type-list');
+        $config['total_rows'] = $cnt;
+        $config['per_page'] = 20;
+        $config['uri_segment'] = 2;
+        $config['attributes'] = array('class' => 'page-link');
+        $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
+        $config['full_tag_close'] = '</ul>';
+        $config['num_tag_open'] = '<li class="page-item">';
+        $config['num_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['prev_tag_open'] = '<li class="page-item">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_tag_open'] = '<li class="page-item">';
+        $config['next_tag_close'] = '</li>';
+        $config['prev_link'] = "Prev";
+        $config['next_link'] = "Next";
+        $this->pagination->initialize($config);
+
+        $sql = "
         SELECT * 
         FROM tsk_emp_type_info 
         WHERE status != 'Delete'
@@ -481,81 +483,81 @@ public function emp_type_list()
         LIMIT " . $this->uri->segment(2, 0) . "," . $config['per_page'] . "
     ";
 
-    $query = $this->db->query($sql);
-    $data['record_list'] = $query->result_array();
+        $query = $this->db->query($sql);
+        $data['record_list'] = $query->result_array();
 
-    $data['pagination'] = $this->pagination->create_links();
+        $data['pagination'] = $this->pagination->create_links();
 
-    $this->load->view('page/master/emp-type-list', $data);
-}
-
-
-public function blood_group_list()
-{
-    if (!$this->session->userdata(SESS_HD . 'logged_in')) {
-        redirect();
+        $this->load->view('page/master/emp-type-list', $data);
     }
 
-    if (
-        $this->session->userdata(SESS_HD . 'level') != 'Admin'
-        && $this->session->userdata(SESS_HD . 'level') != 'Staff'
-    ) {
-        echo "<h3 style='color:red;'>Permission Denied</h3>";
-        exit;
-    }
 
-    $data['js'] = 'blood-group-list.inc';
+    public function blood_group_list()
+    {
+        if (!$this->session->userdata(SESS_HD . 'logged_in')) {
+            redirect();
+        }
 
-    /* ===================== ADD ===================== */
-    if ($this->input->post('mode') == 'Add') {
-        $ins = array(
-            'blood_group_name' => $this->input->post('blood_group_name'),
-            'status'           => $this->input->post('status'),
-        );
-        $this->db->insert('sas_blood_group_info', $ins);
-        redirect('blood-group-list/');
-    }
+        if (
+            $this->session->userdata(SESS_HD . 'level') != 'Admin'
+            && $this->session->userdata(SESS_HD . 'level') != 'Staff'
+        ) {
+            echo "<h3 style='color:red;'>Permission Denied</h3>";
+            exit;
+        }
 
-    /* ===================== EDIT ===================== */
-    if ($this->input->post('mode') == 'Edit') {
-        $upd = array(
-            'blood_group_name' => $this->input->post('blood_group_name'),
-            'status'           => $this->input->post('status'),
-        );
-        $this->db->where('blood_group_id', $this->input->post('blood_group_id'));
-        $this->db->update('sas_blood_group_info', $upd);
+        $data['js'] = 'blood-group-list.inc';
 
-        redirect('blood-group-list/');
-    }
+        /* ===================== ADD ===================== */
+        if ($this->input->post('mode') == 'Add') {
+            $ins = array(
+                'blood_group_name' => $this->input->post('blood_group_name'),
+                'status' => $this->input->post('status'),
+            );
+            $this->db->insert('sas_blood_group_info', $ins);
+            redirect('blood-group-list/');
+        }
 
-    $this->load->library('pagination');
+        /* ===================== EDIT ===================== */
+        if ($this->input->post('mode') == 'Edit') {
+            $upd = array(
+                'blood_group_name' => $this->input->post('blood_group_name'),
+                'status' => $this->input->post('status'),
+            );
+            $this->db->where('blood_group_id', $this->input->post('blood_group_id'));
+            $this->db->update('sas_blood_group_info', $upd);
 
-    $this->db->where('status != ', 'Delete');
-    $this->db->from('sas_blood_group_info');
-    $data['total_records'] = $cnt = $this->db->count_all_results();
+            redirect('blood-group-list/');
+        }
 
-    $data['sno'] = $this->uri->segment(2, 0);
+        $this->load->library('pagination');
 
-    $config['base_url'] = site_url('blood-group-list');
-    $config['total_rows'] = $cnt;
-    $config['per_page'] = 20;
-    $config['uri_segment'] = 2;
-    $config['attributes'] = array('class' => 'page-link');
-    $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
-    $config['full_tag_close'] = '</ul>';
-    $config['num_tag_open'] = '<li class="page-item">';
-    $config['num_tag_close'] = '</li>';
-    $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
-    $config['cur_tag_close'] = '</a></li>';
-    $config['prev_tag_open'] = '<li class="page-item">';
-    $config['prev_tag_close'] = '</li>';
-    $config['next_tag_open'] = '<li class="page-item">';
-    $config['next_tag_close'] = '</li>';
-    $config['prev_link'] = "Prev";
-    $config['next_link'] = "Next";
-    $this->pagination->initialize($config);
+        $this->db->where('status != ', 'Delete');
+        $this->db->from('sas_blood_group_info');
+        $data['total_records'] = $cnt = $this->db->count_all_results();
 
-    $sql = "
+        $data['sno'] = $this->uri->segment(2, 0);
+
+        $config['base_url'] = site_url('blood-group-list');
+        $config['total_rows'] = $cnt;
+        $config['per_page'] = 20;
+        $config['uri_segment'] = 2;
+        $config['attributes'] = array('class' => 'page-link');
+        $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
+        $config['full_tag_close'] = '</ul>';
+        $config['num_tag_open'] = '<li class="page-item">';
+        $config['num_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['prev_tag_open'] = '<li class="page-item">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_tag_open'] = '<li class="page-item">';
+        $config['next_tag_close'] = '</li>';
+        $config['prev_link'] = "Prev";
+        $config['next_link'] = "Next";
+        $this->pagination->initialize($config);
+
+        $sql = "
         SELECT * 
         FROM sas_blood_group_info 
         WHERE status != 'Delete'
@@ -563,249 +565,403 @@ public function blood_group_list()
         LIMIT " . $this->uri->segment(2, 0) . "," . $config['per_page'] . "
     ";
 
-    $query = $this->db->query($sql);
-    $data['record_list'] = $query->result_array();
+        $query = $this->db->query($sql);
+        $data['record_list'] = $query->result_array();
 
-    $data['pagination'] = $this->pagination->create_links();
+        $data['pagination'] = $this->pagination->create_links();
 
-    $this->load->view('page/master/blood-group-list', $data);
-}
-
-
-    public function add_employee() 
-{
-    if(!$this->session->userdata(SESS_HD . 'logged_in'))  redirect();
-    
-    if($this->session->userdata(SESS_HD . 'level') != 'Admin' && $this->session->userdata(SESS_HD . 'level') != 'Staff')
-    {
-        echo "<h3 style='color:red;'>Permission Denied</h3>"; exit;
-    }   
-        	    
-    $data['js'] = 'add-employee.inc';  
-    $data['s_url'] = 'add-employee';  
-    $data['title'] = 'Create New Employee Info';    
-    
-    
-    if($this->input->post('mode') == 'Add')
-    {
-        $emp_code = $this->input->post('employee_code');
-        $config['upload_path'] = 'emp_photo/';
-        $config['file_name'] =  $emp_code. "_emp_". date('YmdHis');
-		$config['allowed_types'] = 'gif|jpg|png|jpeg';
-        
-        $this->load->library('upload', $config); 
-        
-        
-        if ($this->upload->do_upload('photo_img'))
-        {
-            $file_array = $this->upload->data();	 
-            $photo_img	= 'emp_photo/'. $file_array['file_name'];  
-        }
-        else
-        {
-             $photo_img = '';    
-        }
-        
-       $ins = array(
-                'employee_name' => $this->input->post('employee_name'), 
-                'dob' => $this->input->post('dob'), 
-                'gender' => $this->input->post('gender'), 
-                'employee_category' => $this->input->post('employee_category'), 
-                'department_id' => $this->input->post('department_id'), 
-                'department_head' => $this->input->post('department_head'), 
-                'emp_category_head' => $this->input->post('emp_category_head'), 
-                'mgt_head' => $this->input->post('mgt_head'), 
-                'designation_id' => $this->input->post('designation_id'), 
-                'hire_date' => $this->input->post('hire_date'), 
-                'mobile' => $this->input->post('mobile'), 
-                'alt_mobile' => $this->input->post('alt_mobile'), 
-                'email' => $this->input->post('email'), 
-                'marital_status' => $this->input->post('marital_status'), 
-                'blood_group' => $this->input->post('blood_group'), 
-                'permanent_address' => $this->input->post('permanent_address'), 
-                'temporary_address' => $this->input->post('temporary_address'), 
-                'roles' => $this->input->post('roles'), 
-                'responsibility' => $this->input->post('responsibility'), 
-                'casual_leave' => $this->input->post('casual_leave'), 
-                'medical_leave' => $this->input->post('medical_leave'), 
-                'ason_date_leave_entry' => $this->input->post('ason_date_leave_entry'), 
-                'permission' => $this->input->post('permission'), 
-                'in_time' => $this->input->post('in_time'), 
-                'out_time' => $this->input->post('out_time'), 
-                'fixed_salary' => $this->input->post('fixed_salary'), 
-                'is_esi_pf_req' => $this->input->post('is_esi_pf_req'), 
-                'esi_no' => $this->input->post('esi_no'), 
-                'pf_salary_max_limit' => $this->input->post('pf_salary_max_limit'), 
-                'uan_no' => $this->input->post('uan_no'), 
-                'emp_bank_def_ac' => $this->input->post('emp_bank_def_ac'), 
-                'enable_loan' => $this->input->post('enable_loan'), 
-                'enable_advance' => $this->input->post('enable_advance'), 
-                'emp_type' => $this->input->post('emp_type'), 
-                'att_mandatory' => $this->input->post('att_mandatory'), 
-                'photo_img' => $photo_img ,
-                'status' => 'Active' ,
-                'created_by' => $this->session->userdata(SESS_HD . 'user_id'),                          
-                'created_date' => date('Y-m-d H:i:s') ,
-                'updated_by' => $this->session->userdata(SESS_HD . 'user_id'),                          
-                'updated_date' => date('Y-m-d H:i:s')     
-                                        
-        ); 
-        $this->db->insert('tsk_employee_info', $ins); 
-        
-        $employee_id = $this->db->insert_id();
-        
-        $dyn_fld_opt_id = $this->input->post('dyn_fld_opt_id');
-        $dyn_fld_opt_val_id = $this->input->post('dyn_fld_opt_val_id');
-        foreach($dyn_fld_opt_id as $key => $opt_id){
-            if(is_array($dyn_fld_opt_val_id[$opt_id]))
-            {
-                $fld_opt_val_id = implode(',',$dyn_fld_opt_val_id[$opt_id]);
-            } else {
-              $fld_opt_val_id  = $dyn_fld_opt_val_id[$opt_id];
-            }
-            
-            if(!empty($fld_opt_val_id)) {
-                $ins = array(
-                                'employee_id' => $employee_id, 
-                                'dyn_fld_opt_id' => $opt_id, 
-                                'dyn_fld_opt_values' => $fld_opt_val_id, 
-                                'status' => 'Active'                                 
-                            );
-                            
-                $this->db->insert('tsk_employee_fld_opt_info', $ins); 
-            }
-        }
-        
-        $this->session->set_userdata('alert_success_msg', "Employee Information Successfully Added");
-        
-        redirect('employee-list');
-       
+        $this->load->view('page/master/blood-group-list', $data);
     }
-    
-     
-    $sql = "
+
+
+    public function add_employee()
+    {
+        if (!$this->session->userdata(SESS_HD . 'logged_in'))
+            redirect();
+
+        if ($this->session->userdata(SESS_HD . 'level') != 'Admin' && $this->session->userdata(SESS_HD . 'level') != 'Staff') {
+            echo "<h3 style='color:red;'>Permission Denied</h3>";
+            exit;
+        }
+
+        $data['js'] = 'add-employee.inc';
+        $data['s_url'] = 'add-employee';
+        $data['title'] = 'Create New Employee Info';
+
+
+        if ($this->input->post('mode') == 'Add') {
+            $emp_code = $this->input->post('employee_code');
+            $config['upload_path'] = 'emp_photo/';
+            $config['file_name'] = $emp_code . "_emp_" . date('YmdHis');
+            $config['allowed_types'] = 'gif|jpg|png|jpeg';
+
+            $this->load->library('upload', $config);
+
+
+            if ($this->upload->do_upload('photo_img')) {
+                $file_array = $this->upload->data();
+                $photo_img = 'emp_photo/' . $file_array['file_name'];
+            } else {
+                $photo_img = '';
+            }
+
+            $ins = array(
+                'employee_name' => $this->input->post('employee_name'),
+                'dob' => $this->input->post('dob'),
+                'gender' => $this->input->post('gender'),
+                'employee_category' => $this->input->post('employee_category'),
+                'department_id' => $this->input->post('department_id'),
+                'department_head' => $this->input->post('department_head'),
+                'emp_category_head' => $this->input->post('emp_category_head'),
+                'mgt_head' => $this->input->post('mgt_head'),
+                'designation_id' => $this->input->post('designation_id'),
+                'hire_date' => $this->input->post('hire_date'),
+                'mobile' => $this->input->post('mobile'),
+                'alt_mobile' => $this->input->post('alt_mobile'),
+                'email' => $this->input->post('email'),
+                'marital_status' => $this->input->post('marital_status'),
+                'blood_group' => $this->input->post('blood_group'),
+                'permanent_address' => $this->input->post('permanent_address'),
+                'temporary_address' => $this->input->post('temporary_address'),
+                'roles' => $this->input->post('roles'),
+                'responsibility' => $this->input->post('responsibility'),
+                'casual_leave' => $this->input->post('casual_leave'),
+                'medical_leave' => $this->input->post('medical_leave'),
+                'ason_date_leave_entry' => $this->input->post('ason_date_leave_entry'),
+                'permission' => $this->input->post('permission'),
+                'in_time' => $this->input->post('in_time'),
+                'out_time' => $this->input->post('out_time'),
+                'fixed_salary' => $this->input->post('fixed_salary'),
+                'is_esi_pf_req' => $this->input->post('is_esi_pf_req'),
+                'esi_no' => $this->input->post('esi_no'),
+                'pf_salary_max_limit' => $this->input->post('pf_salary_max_limit'),
+                'uan_no' => $this->input->post('uan_no'),
+                'emp_bank_def_ac' => $this->input->post('emp_bank_def_ac'),
+                'enable_loan' => $this->input->post('enable_loan'),
+                'enable_advance' => $this->input->post('enable_advance'),
+                'emp_type' => $this->input->post('emp_type'),
+                'att_mandatory' => $this->input->post('att_mandatory'),
+                'photo_img' => $photo_img,
+                'status' => 'Active',
+                'created_by' => $this->session->userdata(SESS_HD . 'user_id'),
+                'created_date' => date('Y-m-d H:i:s'),
+                'updated_by' => $this->session->userdata(SESS_HD . 'user_id'),
+                'updated_date' => date('Y-m-d H:i:s')
+
+            );
+            $this->db->insert('tsk_employee_info', $ins);
+
+            $employee_id = $this->db->insert_id();
+
+            $dyn_fld_opt_id = $this->input->post('dyn_fld_opt_id');
+            $dyn_fld_opt_val_id = $this->input->post('dyn_fld_opt_val_id');
+            foreach ($dyn_fld_opt_id as $key => $opt_id) {
+                if (is_array($dyn_fld_opt_val_id[$opt_id])) {
+                    $fld_opt_val_id = implode(',', $dyn_fld_opt_val_id[$opt_id]);
+                } else {
+                    $fld_opt_val_id = $dyn_fld_opt_val_id[$opt_id];
+                }
+
+                if (!empty($fld_opt_val_id)) {
+                    $ins = array(
+                        'employee_id' => $employee_id,
+                        'dyn_fld_opt_id' => $opt_id,
+                        'dyn_fld_opt_values' => $fld_opt_val_id,
+                        'status' => 'Active'
+                    );
+
+                    $this->db->insert('tsk_employee_fld_opt_info', $ins);
+                }
+            }
+
+            $this->session->set_userdata('alert_success_msg', "Employee Information Successfully Added");
+
+            redirect('employee-list');
+
+        }
+
+
+        $sql = "
             select 
             a.emp_category_name             
             from tsk_emp_category_info as a  
             where a.status = 'Active'  
             order by a.emp_category_name asc                 
-    "; 
-    
-    $query = $this->db->query($sql);
-    
-    $data['emp_category_opt'] = array();
-   
-    foreach ($query->result_array() as $row)
-    {
-        $data['emp_category_opt'][$row['emp_category_name']] = $row['emp_category_name'];     
-    }  
-    
-    $sql = "
+    ";
+
+        $query = $this->db->query($sql);
+
+        $data['emp_category_opt'] = array();
+
+        foreach ($query->result_array() as $row) {
+            $data['emp_category_opt'][$row['emp_category_name']] = $row['emp_category_name'];
+        }
+
+        $sql = "
             select 
             a.emp_type_name             
             from tsk_emp_type_info as a  
             where a.status = 'Active'  
             order by a.emp_type_name asc                 
-    "; 
-    
-    $query = $this->db->query($sql);
-    
-    $data['emp_type_opt'] = array();
-   
-    foreach ($query->result_array() as $row)
-    {
-        $data['emp_type_opt'][$row['emp_type_name']] = $row['emp_type_name'];     
-    }  
-    
-    $sql = "
+    ";
+
+        $query = $this->db->query($sql);
+
+        $data['emp_type_opt'] = array();
+
+        foreach ($query->result_array() as $row) {
+            $data['emp_type_opt'][$row['emp_type_name']] = $row['emp_type_name'];
+        }
+
+        $sql = "
             select 
             a.blood_group_name             
             from sas_blood_group_info as a  
             where a.status = 'Active'  
             order by a.blood_group_name asc                 
-    "; 
-    
-    $query = $this->db->query($sql);
-    
-    $data['blood_group_opt'] = array();
-   
-    foreach ($query->result_array() as $row)
+    ";
+
+        $query = $this->db->query($sql);
+
+        $data['blood_group_opt'] = array();
+
+        foreach ($query->result_array() as $row) {
+            $data['blood_group_opt'][$row['blood_group_name']] = $row['blood_group_name'];
+        }
+
+
+
+        // $sql = "
+        //         select 
+        //         a.department_id,             
+        //         a.department_name             
+        //         from tsk_department_info as a  
+        //         where a.status = 'Active'  
+        //         order by a.department_name asc                 
+        // "; 
+
+        // $query = $this->db->query($sql);
+
+        // $data['department_opt'] = array();
+
+        // foreach ($query->result_array() as $row)
+        // {
+        //     $data['department_opt'][$row['department_id']] = $row['department_name'];     
+        // }  
+
+
+        $data['marital_status_opt'] = array(
+            'Married' => 'Married',
+            'Single' => 'Single',
+            'Widowed' => 'Widowed',
+            'Separated' => 'Separated',
+            'Divorced ' => 'Divorced',
+        );
+
+        $data['emp_bank_def_ac_opt'] = array(
+            'Bank - Salary' => 'Bank - Salary',
+            'Bank - Personal' => 'Bank - Personal'
+        );
+
+
+        // $sql = "
+        //         select 
+        //         a.* 
+        //         from tsk_dyn_fld_opt_info as a   
+        //         where a.status = 'Active' 
+        //         order by a.dyn_fld_opt_category  , a.fld_s_order , a.dyn_fld_opt_name             
+        //         "; 
+
+        // $query = $this->db->query($sql);
+
+        // $data['dyn_fld_opt'] = array();
+
+        // foreach ($query->result_array() as $row)
+        // {
+        //     $data['dyn_fld_opt'][$row['dyn_fld_opt_category']][] = $row;     
+        // }  
+
+        // $sql = "
+        //         select 
+        //         a.* 
+        //         from tsk_dyn_fld_opt_val_info as a   
+        //         where a.status = 'Active' 
+        //         order by a.dyn_fld_opt_id  , a.fld_val_s_order , a.dyn_fld_opt_val_name             
+        //         "; 
+
+        // $query = $this->db->query($sql);
+
+        // $data['dyn_fld_val_opt'] = array();
+
+        // foreach ($query->result_array() as $row)
+        // {
+        //     $data['dyn_fld_val_opt'][$row['dyn_fld_opt_id']][$row['dyn_fld_opt_val_id']] = $row['dyn_fld_opt_val_name'];     
+        // } 
+
+
+
+
+        $this->load->view('page/master/' . $data['s_url'], $data);
+    }
+
+    public function task_list()
     {
-        $data['blood_group_opt'][$row['blood_group_name']] = $row['blood_group_name'];     
-    }  
-    
-    
-    
-    // $sql = "
-    //         select 
-    //         a.department_id,             
-    //         a.department_name             
-    //         from tsk_department_info as a  
-    //         where a.status = 'Active'  
-    //         order by a.department_name asc                 
-    // "; 
-    
-    // $query = $this->db->query($sql);
-    
-    // $data['department_opt'] = array();
-   
-    // foreach ($query->result_array() as $row)
-    // {
-    //     $data['department_opt'][$row['department_id']] = $row['department_name'];     
-    // }  
-    
-    
-     $data['marital_status_opt'] = array(
-                                        'Married'=>'Married',
-                                        'Single'=>'Single',
-                                        'Widowed'=>'Widowed',
-                                        'Separated'=>'Separated',
-                                        'Divorced '=>'Divorced',
-                                     );
-                                     
-      $data['emp_bank_def_ac_opt'] = array(
-                                        'Bank - Salary'=>'Bank - Salary',
-                                        'Bank - Personal'=>'Bank - Personal' 
-                                     );                                
-                                     
-                                     
-    // $sql = "
-    //         select 
-    //         a.* 
-    //         from tsk_dyn_fld_opt_info as a   
-    //         where a.status = 'Active' 
-    //         order by a.dyn_fld_opt_category  , a.fld_s_order , a.dyn_fld_opt_name             
-    //         "; 
-    
-    // $query = $this->db->query($sql);
-    
-    // $data['dyn_fld_opt'] = array();
-   
-    // foreach ($query->result_array() as $row)
-    // {
-    //     $data['dyn_fld_opt'][$row['dyn_fld_opt_category']][] = $row;     
-    // }  
-    
-    // $sql = "
-    //         select 
-    //         a.* 
-    //         from tsk_dyn_fld_opt_val_info as a   
-    //         where a.status = 'Active' 
-    //         order by a.dyn_fld_opt_id  , a.fld_val_s_order , a.dyn_fld_opt_val_name             
-    //         "; 
-    
-    // $query = $this->db->query($sql);
-    
-    // $data['dyn_fld_val_opt'] = array();
-   
-    // foreach ($query->result_array() as $row)
-    // {
-    //     $data['dyn_fld_val_opt'][$row['dyn_fld_opt_id']][$row['dyn_fld_opt_val_id']] = $row['dyn_fld_opt_val_name'];     
-    // } 
-    
-                            
-    
-    
-    $this->load->view('page/master/'. $data['s_url'] ,$data); 
-}
+        // Check login
+        if (!$this->session->userdata(SESS_HD . 'logged_in')) {
+            redirect('login'); // or wherever your login page is
+        }
+
+        // Optional: Restrict access to Admin/Staff only
+        $allowed_levels = ['Admin', 'Staff'];
+        if (!in_array($this->session->userdata(SESS_HD . 'level'), $allowed_levels)) {
+            echo "<h3 style='color:red;'>Permission Denied</h3>";
+            exit;
+        }
+
+        $data['js'] = 'task-list.inc';
+
+        // Add New Task
+        if ($this->input->post('mode') == 'Add') {
+            $ins = [
+                'client_id' => $this->input->post('client_id'),
+                'project_id' => $this->input->post('project_id'),
+                'task_title' => $this->input->post('task_title'),
+                'task_description' => $this->input->post('task_description'),
+                'priority' => $this->input->post('priority'),
+                'task_status' => $this->input->post('task_status'),
+                'start_date' => $this->input->post('start_date'),
+                'due_date' => $this->input->post('due_date'),
+                'status' => $this->input->post('status'),
+                'created_by' => $this->session->userdata(SESS_HD . 'user_id'),
+                'created_date' => date('Y-m-d H:i:s')
+            ];
+
+            $this->db->insert('tsk_task_info', $ins);
+            redirect('task-list');
+        }
+
+        // Edit Task
+        if ($this->input->post('mode') == 'Edit') {
+            $upd = [
+                'client_id' => $this->input->post('client_id'),
+                'project_id' => $this->input->post('project_id'),
+                'task_title' => $this->input->post('task_title'),
+                'task_description' => $this->input->post('task_description'),
+                'priority' => $this->input->post('priority'),
+                'task_status' => $this->input->post('task_status'),
+                'start_date' => $this->input->post('start_date'),
+                'due_date' => $this->input->post('due_date'),
+                'status' => $this->input->post('status'),
+                'updated_by' => $this->session->userdata(SESS_HD . 'user_id'),
+                'updated_date' => date('Y-m-d H:i:s')
+            ];
+
+            $this->db->where('task_id', $this->input->post('task_id'));
+            $this->db->update('tsk_task_info', $upd);
+            redirect('task-list');
+        }
+
+        $this->load->library('pagination');
+
+        $this->db->where('status !=', 'Delete');
+        $this->db->from('tsk_task_info');
+        $data['total_records'] = $cnt = $this->db->count_all_results();
+
+        $data['sno'] = $this->uri->segment(2, 0);
+
+        $config['base_url'] = site_url('task-list');
+        $config['total_rows'] = $cnt;
+        $config['per_page'] = 20;
+        $config['uri_segment'] = 2;
+        $config['attributes'] = array('class' => 'page-link');
+        $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
+        $config['full_tag_close'] = '</ul>';
+        $config['num_tag_open'] = '<li class="page-item">';
+        $config['num_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['prev_tag_open'] = '<li class="page-item">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_tag_open'] = '<li class="page-item">';
+        $config['next_tag_close'] = '</li>';
+        $config['prev_link'] = "Prev";
+        $config['next_link'] = "Next";
+        $this->pagination->initialize($config);
+
+        $data['client_opt'] = ['' => 'Select Client'];
+
+        $sql = "
+            SELECT 
+                client_id,
+                client_name
+            FROM tsk_clients_info
+            WHERE status = 'Active'
+            ORDER BY client_name ASC
+        ";
+
+        $query = $this->db->query($sql);
+
+        foreach ($query->result_array() as $row) {
+            $data['client_opt'][$row['client_id']] = $row['client_name'];
+        }
+
+        $data['project_opt'] = ['' => 'Select Project'];
+
+        $sql = "
+            SELECT 
+                project_id,
+                project_name
+            FROM tsk_project_info
+            WHERE status != 'Delete'
+            ORDER BY project_name ASC
+        ";
+
+        $query = $this->db->query($sql);
+
+        foreach ($query->result_array() as $row) {
+            $data['project_opt'][$row['project_id']] = $row['project_name'];
+        }
+
+
+        $data['priority_opt'] = [
+            '' => 'Select Priority',
+            'Low' => 'Low',
+            'Medium' => 'Medium',
+            'High' => 'High',
+            'Critical' => 'Critical'
+        ];
+
+        $data['status_opt'] = [
+            '' => 'Select Status',
+            'Pending' => 'Pending',
+            'In Progress' => 'In Progress',
+            'Completed' => 'Completed',
+            'On Hold' => 'On Hold'
+        ];
+
+        // Fetch task list with joins
+        $sql = "
+            SELECT t.*, c.client_name, p.project_name
+            FROM tsk_task_info t
+            LEFT JOIN tsk_clients_info c ON t.client_id = c.client_id
+            LEFT JOIN tsk_project_info p ON t.project_id = p.project_id
+            WHERE t.status != 'Delete'
+            ORDER BY t.task_id DESC 
+            LIMIT " . $this->uri->segment(2, 0) . ", " . $config['per_page'];
+
+        $query = $this->db->query($sql);
+        $data['record_list'] = $query->result_array();
+
+        $data['pagination'] = $this->pagination->create_links();
+
+
+        $this->load->view('page/master/task-list', $data);
+    }
+
+
+
+
+
+
+
 }

@@ -37,7 +37,7 @@ class General extends CI_Controller
 
 
 
-            if ($table == 'sas_blood_group_info') {
+        if ($table == 'sas_blood_group_info') {
             $query = $this->db->query(" 
                 select 
                 a.* 
@@ -54,7 +54,7 @@ class General extends CI_Controller
         }
 
 
-            if ($table == 'tsk_emp_type_info') {
+        if ($table == 'tsk_emp_type_info') {
             $query = $this->db->query(" 
                 select 
                 a.* 
@@ -71,7 +71,7 @@ class General extends CI_Controller
         }
 
 
-          if ($table == 'tsk_emp_category_info') {
+        if ($table == 'tsk_emp_category_info') {
             $query = $this->db->query(" 
                 select 
                 a.* 
@@ -168,6 +168,23 @@ class General extends CI_Controller
             }
 
         }
+        if ($table == 'tsk_task_info') {
+            $query = $this->db->query(" 
+                select 
+                a.* 
+                from tsk_task_info as a  
+                where a.task_id = '" . $rec_id . "'
+            ");
+
+            $rec_list = array();
+
+            foreach ($query->result_array() as $row) {
+                $rec_list = $row;
+            }
+
+        }
+
+
 
 
         $this->db->close();
@@ -191,16 +208,16 @@ class General extends CI_Controller
 
 
         if ($table == 'sas_blood_group_info') {
-    $this->db->where('blood_group_id', $rec_id);
-    $this->db->update('sas_blood_group_info', array('status' => 'Delete'));
-    echo "Blood Group Deleted Successfully";
-}
+            $this->db->where('blood_group_id', $rec_id);
+            $this->db->update('sas_blood_group_info', array('status' => 'Delete'));
+            echo "Blood Group Deleted Successfully";
+        }
 
         if ($table == 'tsk_emp_type_info') {
-    $this->db->where('emp_type_id', $rec_id);
-    $this->db->update('tsk_emp_type_info', array('status' => 'Delete'));
-    echo "Employee Type Deleted Successfully";
-}
+            $this->db->where('emp_type_id', $rec_id);
+            $this->db->update('tsk_emp_type_info', array('status' => 'Delete'));
+            echo "Employee Type Deleted Successfully";
+        }
 
         if ($table == 'tsk_emp_category_info') {
             $this->db->where('emp_category_id', $rec_id);
@@ -225,7 +242,11 @@ class General extends CI_Controller
             $this->db->update('tsk_project_info', array('status' => 'Delete'));
             echo "Project Deleted Successfully";
         }
-
+        if ($table == 'tsk_task_info') {
+            $this->db->where('task_id', $rec_id);
+            $this->db->update('tsk_task_info', array('status' => 'Delete'));
+            echo "Task Deleted Successfully";
+        }
 
     }
 

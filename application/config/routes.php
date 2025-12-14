@@ -53,12 +53,9 @@ $route['default_controller'] = 'login';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
-$route['logout'] = 'login/logout'; 
-$route['dash'] = 'dashboard'; 
+$route['logout'] = 'login/logout';  
 
-$route['add-tender-enquiry']='tender/add_tender_enquiry';
-$route['tender-enquiry-list'] = 'tender/tender_enquiry_list';
-$route['tender-enquiry-edit/(:num)'] = 'tender/edit_tender_enquiry/$1'; 
+ 
 
 $route['change-password'] = 'login/change_password';
 $route['dash'] = 'dashboard'; 
@@ -89,3 +86,7 @@ $route['emp-type-list/(:num)'] = 'master/emp_type_list/$1';
 
 $route['blood-group-list'] = 'master/blood_group_list';
 $route['blood-group-list/(:num)'] = 'master/blood_group_list/$1';
+
+ $route['task-list'] = 'master/task_list';
+$route['task-list/(:num)'] = 'master/task_list/$1';
+
