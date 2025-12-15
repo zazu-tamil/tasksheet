@@ -208,124 +208,219 @@ class Master extends CI_Controller
         $this->load->view('page/master/client-list', $data);
     }
     public function project_list()
-    {
-        if (!$this->session->userdata(SESS_HD . 'logged_in'))
-            redirect();
+{
+    if (!$this->session->userdata(SESS_HD . 'logged_in'))
+        redirect();
 
-        if (
-            $this->session->userdata(SESS_HD . 'level') != 'Admin' &&
-            $this->session->userdata(SESS_HD . 'level') != 'Staff'
-        ) {
-            echo "<h3 style='color:red;'>Permission Denied</h3>";
-            exit;
+    if (
+        $this->session->userdata(SESS_HD . 'level') != 'Admin' &&
+        $this->session->userdata(SESS_HD . 'level') != 'Staff'
+    ) {
+        echo "<h3 style='color:red;'>Permission Denied</h3>";
+        exit;
+    }
+
+    $data['js'] = 'project-list.inc';
+
+    // Upload path for project documents
+    $upload_path = FCPATH . 'uploads/project_documents/';
+    if (!is_dir($upload_path)) {
+        mkdir($upload_path, 0755, true);
+    }
+
+    // === ADD NEW PROJECT ===
+    if ($this->input->post('mode') == 'Add') {
+        $document_paths = '';
+
+        // Handle multiple file upload
+        if (!empty($_FILES['document_upload']['name'][0])) {
+            $files = $_FILES['document_upload'];
+            $file_count = count($files['name']);
+            $uploaded_paths = [];
+
+            $config['upload_path']   = $upload_path;
+            $config['allowed_types'] = 'pdf|doc|docx|jpg|jpeg|png|gif|txt|xls|xlsx';
+            $config['max_size']      = 10240; // 10MB per file
+            $this->load->library('upload');
+
+            for ($i = 0; $i < $file_count; $i++) {
+                if ($files['error'][$i] === UPLOAD_ERR_OK) {
+                    $_FILES['single_file']['name']     = $files['name'][$i];
+                    $_FILES['single_file']['type']     = $files['type'][$i];
+                    $_FILES['single_file']['tmp_name'] = $files['tmp_name'][$i];
+                    $_FILES['single_file']['error']    = $files['error'][$i];
+                    $_FILES['single_file']['size']     = $files['size'][$i];
+
+                    $config['file_name'] = time() . '_' . rand(1000,9999) . '_' . preg_replace("/\s+/", "_", $files['name'][$i]);
+
+                    $this->upload->initialize($config);
+
+                    if ($this->upload->do_upload('single_file')) {
+                        $upload_data = $this->upload->data();
+                        $uploaded_paths[] = 'uploads/project_documents/' . $upload_data['file_name'];
+                    } else {
+                        $this->session->set_flashdata('alert_error', $this->upload->display_errors());
+                        redirect('project-list');
+                    }
+                }
+            }
+
+            if (!empty($uploaded_paths)) {
+                $document_paths = implode(',', $uploaded_paths);
+            }
         }
 
-        $data['js'] = 'project-list.inc';
-
-        // Add New Project
-        if ($this->input->post('mode') == 'Add') {
-            $ins = array(
-                'client_id' => $this->input->post('client_id'),
-                'project_code' => $this->input->post('project_code'),
-                'project_name' => $this->input->post('project_name'),
-                'project_description' => $this->input->post('project_description'),
-                'start_date' => $this->input->post('start_date'),
-                'end_date' => $this->input->post('end_date'),
-                'project_status' => $this->input->post('project_status'),
-                'status' => $this->input->post('Status'),
-                'created_by' => $this->session->userdata(SESS_HD . 'user_id'),
-                'created_date' => date('Y-m-d H:i:s')
-            );
-
-            $this->db->insert('tsk_project_info', $ins);
-            redirect('project-list');
-        }
-
-        // Edit Project
-        if ($this->input->post('mode') == 'Edit') {
-            $upd = array(
-                'client_id' => $this->input->post('client_id'),
-                'project_code' => $this->input->post('project_code'),
-                'project_name' => $this->input->post('project_name'),
-                'project_description' => $this->input->post('project_description'),
-                'start_date' => $this->input->post('start_date'),
-                'end_date' => $this->input->post('end_date'),
-                'project_status' => $this->input->post('project_status'),
-                'status' => $this->input->post('status'),
-                'updated_by' => $this->session->userdata(SESS_HD . 'user_id'),
-                'updated_date' => date('Y-m-d H:i:s')
-            );
-
-            $this->db->where('project_id', $this->input->post('project_id'));
-            $this->db->update('tsk_project_info', $upd);
-            redirect('project-list');
-        }
-
-        $this->load->library('pagination');
-
-        $this->db->where('status !=', 'Delete');
-        $this->db->from('tsk_project_info');
-        $data['total_records'] = $cnt = $this->db->count_all_results();
-
-        $data['sno'] = $this->uri->segment(2, 0);
-
-        $config['base_url'] = site_url('project-list');
-        $config['total_rows'] = $cnt;
-        $config['per_page'] = 20;
-        $config['uri_segment'] = 2;
-        $config['attributes'] = array('class' => 'page-link');
-        $config['full_tag_open'] = '<ul class="pagination pagination-sm no-margin pull-right">';
-        $config['full_tag_close'] = '</ul>';
-        $config['num_tag_open'] = '<li class="page-item">';
-        $config['num_tag_close'] = '</li>';
-        $config['cur_tag_open'] = '<li class="page-item active"><a href="#" class="page-link">';
-        $config['cur_tag_close'] = '</a></li>';
-        $config['prev_tag_open'] = '<li class="page-item">';
-        $config['prev_tag_close'] = '</li>';
-        $config['next_tag_open'] = '<li class="page-item">';
-        $config['next_tag_close'] = '</li>';
-        $config['prev_link'] = "Prev";
-        $config['next_link'] = "Next";
-        $this->pagination->initialize($config);
-
-        $data['client_opt'] = array();
-
-        $sql = "
-            SELECT 
-                client_id , 
-                client_name 
-            FROM tsk_clients_info
-            WHERE status = 'Active'
-            ORDER BY client_name ASC
-        ";
-        $query = $this->db->query($sql);
-        foreach ($query->result_array() as $row) {
-            $data['client_opt'][$row['client_id']] = $row['client_name'];
-        }
-
-        $data['project_status_opt'] = array(
-            'Pending' => 'Pending',
-            'In Progress' => 'In Progress',
-            'Completed' => 'Completed'
+        $ins = array(
+            'client_id'            => $this->input->post('client_id'),
+            'project_code'         => $this->input->post('project_code'),
+            'project_name'         => $this->input->post('project_name'),
+            'project_description'  => $this->input->post('project_description'),
+            'start_date'           => $this->input->post('start_date'),
+            'end_date'             => $this->input->post('end_date'),
+            'project_status'       => $this->input->post('project_status'),
+            'document_path'        => $document_paths,
+            'status'               => $this->input->post('status'),
+            'created_by'           => $this->session->userdata(SESS_HD . 'user_id'),
+            'created_date'         => date('Y-m-d H:i:s')
         );
 
-
-        $sql = "
-            SELECT a.* 
-            , b.client_name
-            FROM tsk_project_info a
-            LEFT JOIN tsk_clients_info b ON a.client_id = b.client_id
-            WHERE a.status != 'Delete'
-            ORDER BY a.status ASC, a.project_name ASC 
-            LIMIT " . $this->uri->segment(2, 0) . ", " . $config['per_page'];
-
-        $query = $this->db->query($sql);
-        $data['record_list'] = $query->result_array();
-
-        $data['pagination'] = $this->pagination->create_links();
-
-        $this->load->view('page/master/project-list', $data);
+        $this->db->insert('tsk_project_info', $ins);
+        $this->session->set_flashdata('alert_success', 'Project added successfully.');
+        redirect('project-list');
     }
+
+    // === EDIT PROJECT ===
+    if ($this->input->post('mode') == 'Edit') {
+        $project_id = $this->input->post('project_id');
+
+        // Fetch current document paths
+        $current = $this->db->select('document_path')
+                            ->get_where('tsk_project_info', ['project_id' => $project_id])
+                            ->row_array();
+        $existing_paths = !empty($current['document_path']) ? explode(',', $current['document_path']) : [];
+        $document_paths = $current['document_path'];
+
+        // Handle new uploads
+        if (!empty($_FILES['document_upload']['name'][0])) {
+            $files = $_FILES['document_upload'];
+            $file_count = count($files['name']);
+            $new_paths = [];
+
+            $config['upload_path']   = $upload_path;
+            $config['allowed_types'] = 'pdf|doc|docx|jpg|jpeg|png|gif|txt|xls|xlsx';
+            $config['max_size']      = 10240;
+            $this->load->library('upload');
+
+            for ($i = 0; $i < $file_count; $i++) {
+                if ($files['error'][$i] === UPLOAD_ERR_OK) {
+                    $_FILES['single_file']['name']     = $files['name'][$i];
+                    $_FILES['single_file']['type']     = $files['type'][$i];
+                    $_FILES['single_file']['tmp_name'] = $files['tmp_name'][$i];
+                    $_FILES['single_file']['error']    = $files['error'][$i];
+                    $_FILES['single_file']['size']     = $files['size'][$i];
+
+                    $config['file_name'] = time() . '_' . rand(1000,9999) . '_' . preg_replace("/\s+/", "_", $files['name'][$i]);
+
+                    $this->upload->initialize($config);
+
+                    if ($this->upload->do_upload('single_file')) {
+                        $upload_data = $this->upload->data();
+                        $new_paths[] = 'uploads/project_documents/' . $upload_data['file_name'];
+                    } else {
+                        $this->session->set_flashdata('alert_error', $this->upload->display_errors());
+                        redirect('project-list');
+                    }
+                }
+            }
+
+            if (!empty($new_paths)) {
+                $all_paths = array_merge($existing_paths, $new_paths);
+                $document_paths = implode(',', $all_paths);
+            }
+        }
+
+        $upd = array(
+            'client_id'            => $this->input->post('client_id'),
+            'project_code'         => $this->input->post('project_code'),
+            'project_name'         => $this->input->post('project_name'),
+            'project_description'  => $this->input->post('project_description'),
+            'start_date'           => $this->input->post('start_date'),
+            'end_date'             => $this->input->post('end_date'),
+            'project_status'       => $this->input->post('project_status'),
+            'document_path'        => $document_paths,
+            'status'               => $this->input->post('status'),
+            'updated_by'           => $this->session->userdata(SESS_HD . 'user_id'),
+            'updated_date'         => date('Y-m-d H:i:s')
+        );
+
+        $this->db->where('project_id', $project_id);
+        $this->db->update('tsk_project_info', $upd);
+        $this->session->set_flashdata('alert_success', 'Project updated successfully.');
+        redirect('project-list');
+    }
+
+    // === LISTING & PAGINATION ===
+    $this->load->library('pagination');
+
+    $this->db->where('status !=', 'Delete');
+    $data['total_records'] = $this->db->count_all_results('tsk_project_info');
+
+    $data['sno'] = $this->uri->segment(2, 0);
+
+    $config['base_url']   = site_url('project-list');
+    $config['total_rows'] = $data['total_records'];
+    $config['per_page']   = 20;
+    $config['uri_segment']= 2;
+    $config['attributes'] = array('class' => 'page-link');
+    $config['full_tag_open']  = '<ul class="pagination pagination-sm no-margin pull-right">';
+    $config['full_tag_close'] = '</ul>';
+    $config['num_tag_open']   = '<li class="page-item">';
+    $config['num_tag_close']  = '</li>';
+    $config['cur_tag_open']   = '<li class="page-item active"><a href="#" class="page-link">';
+    $config['cur_tag_close']  = '</a></li>';
+    $config['prev_tag_open']  = '<li class="page-item">';
+    $config['prev_tag_close'] = '</li>';
+    $config['next_tag_open']  = '<li class="page-item">';
+    $config['next_tag_close'] = '</li>';
+    $config['prev_link'] = 'Prev';
+    $config['next_link'] = 'Next';
+
+    $this->pagination->initialize($config);
+
+    // Client dropdown options
+    $data['client_opt'] = array('' => 'Select Client');
+    $clients = $this->db->select('client_id, client_name')
+                        ->where('status', 'Active')
+                        ->order_by('client_name')
+                        ->get('tsk_clients_info')
+                        ->result_array();
+    foreach ($clients as $c) {
+        $data['client_opt'][$c['client_id']] = $c['client_name'];
+    }
+
+    $data['project_status_opt'] = array(
+        '' => 'Select Project Status',
+        'Pending'     => 'Pending',
+        'In Progress' => 'In Progress',
+        'Completed'   => 'Completed'
+    );
+
+    // Fetch records
+    $sql = "
+        SELECT a.*, b.client_name
+        FROM tsk_project_info a
+        LEFT JOIN tsk_clients_info b ON a.client_id = b.client_id
+        WHERE a.status != 'Delete'
+        ORDER BY a.status ASC, a.project_name ASC
+        LIMIT ?, ?
+    ";
+    $query = $this->db->query($sql, array($data['sno'], $config['per_page']));
+    $data['record_list'] = $query->result_array();
+
+    $data['pagination'] = $this->pagination->create_links();
+
+    $this->load->view('page/master/project-list', $data);
+}
 
     public function emp_category_list()
     {
