@@ -1,6 +1,4 @@
-<?php
-$current_page = $this->uri->segment(1);
-?>
+ 
 
 <style>
 /* ================================
@@ -68,69 +66,118 @@ $current_page = $this->uri->segment(1);
     width: 20px;
 }
 </style>
+<?php
+$segment1 = $this->uri->segment(1);
+?>
+ 
+    <!-- ================= DASHBOARD ================= -->
+    <li class="<?= ($segment1 == 'dash') ? 'active' : '' ?>">
+        <a href="<?= site_url('dash') ?>">
+            <i class="fa fa-dashboard"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
 
-<!-- ================= DASHBOARD ================= -->
-<li class="<?= ($current_page == 'dash') ? 'active' : '' ?>">
-    <a href="<?= site_url('dash') ?>">
-        <i class="fa fa-dashboard"></i>
-        <span>Dashboard</span>
-    </a>
-</li>
+    <!-- ================= MASTER ================= -->
+    <li class="treeview <?= in_array($segment1, [
+        'user-list',
+        'client-list',
+        'project-list',
+        'task-list',
+        'create-employee',
+        'edit-employee',
+        'emp-category-list',
+        'emp-type-list',
+        'blood-group-list'
+    ]) ? 'active menu-open' : '' ?>">
 
-<!-- ================= MASTER ================= -->
-<li class="treeview <?= in_array($current_page, ['user-list','project-list','task-list','client-list']) ? 'active menu-open' : '' ?>">
-    <a href="#">
-        <i class="fa fa-cubes"></i>
-        <span>Master</span>
-        <span class="pull-right-container">
-            <i class="fa fa-angle-left pull-right"></i>
-        </span>
-    </a>
+        <a href="#">
+            <i class="fa fa-cubes"></i>
+            <span>Master</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+        </a>
 
-    <ul class="treeview-menu">
+        <ul class="treeview-menu">
 
-        <li class="<?= ($current_page == 'user-list') ? 'active' : '' ?>">
-            <a href="<?= site_url('user-list') ?>">
-                <i class="fa fa-user"></i> User List
-            </a>
-        </li>
+            <!-- USER LIST -->
+            <li class="<?= ($segment1 == 'user-list') ? 'active' : '' ?>">
+                <a href="<?= site_url('user-list') ?>">
+                    <i class="fa fa-user"></i> User List
+                </a>
+            </li>
 
-        <li class="<?= ($current_page == 'client-list') ? 'active' : '' ?>">
-            <a href="<?= site_url('client-list') ?>">
-                <i class="fa fa-address-book"></i> Client List
-            </a>
-        </li>
+            <!-- CLIENT LIST -->
+            <li class="<?= ($segment1 == 'client-list') ? 'active' : '' ?>">
+                <a href="<?= site_url('client-list') ?>">
+                    <i class="fa fa-address-book"></i> Client List
+                </a>
+            </li>
 
-        <li class="<?= ($current_page == 'project-list') ? 'active' : '' ?>">
-            <a href="<?= site_url('project-list') ?>">
-                <i class="fa fa-folder"></i> Project List
-            </a>
-        </li>
+            <!-- PROJECT LIST -->
+            <li class="<?= ($segment1 == 'project-list') ? 'active' : '' ?>">
+                <a href="<?= site_url('project-list') ?>">
+                    <i class="fa fa-folder"></i> Project List
+                </a>
+            </li>
 
-        <li class="<?= ($current_page == 'task-list') ? 'active' : '' ?>">
-            <a href="<?= site_url('task-list') ?>">
-                <i class="fa fa-tasks"></i> Task List
-            </a>
-        </li>
+            <!-- TASK LIST -->
+            <li class="<?= ($segment1 == 'task-list') ? 'active' : '' ?>">
+                <a href="<?= site_url('task-list') ?>">
+                    <i class="fa fa-tasks"></i> Task List
+                </a>
+            </li>
 
-    </ul>
-</li>
+            <li class="divider"></li>
 
-<!-- ================= SETTINGS ================= -->
-<li class="treeview <?= ($current_page == 'change-password') ? 'active menu-open' : '' ?>">
-    <a href="#">
-        <i class="fa fa-cog"></i>
-        <span>Settings</span>
-        <span class="pull-right-container">
-            <i class="fa fa-angle-left pull-right"></i>
-        </span>
-    </a>
+            <!-- CREATE EMPLOYEE -->
+            <li class="<?= in_array($segment1, ['create-employee','edit-employee']) ? 'active' : '' ?>">
+                <a href="<?= site_url('create-employee') ?>">
+                    <i class="fa fa-user-plus"></i> Create Employee
+                </a>
+            </li>
 
-    <ul class="treeview-menu">
-        <li class="<?= ($current_page == 'change-password') ? 'active' : '' ?>">
-            <a href="<?= site_url('change-password') ?>">
-                <i class="fa fa-lock"></i> Change Password
-            </a>
-        </li>
-    </ul>
-</li>
+            <!-- EMP CATEGORY -->
+            <li class="<?= ($segment1 == 'emp-category-list') ? 'active' : '' ?>">
+                <a href="<?= site_url('emp-category-list') ?>">
+                    <i class="fa fa-tags"></i> Employee Category
+                </a>
+            </li>
+
+            <!-- EMP TYPE -->
+            <li class="<?= ($segment1 == 'emp-type-list') ? 'active' : '' ?>">
+                <a href="<?= site_url('emp-type-list') ?>">
+                    <i class="fa fa-id-badge"></i> Employee Type
+                </a>
+            </li>
+
+            <!-- BLOOD GROUP -->
+            <li class="<?= ($segment1 == 'blood-group-list') ? 'active' : '' ?>">
+                <a href="<?= site_url('blood-group-list') ?>">
+                    <i class="fa fa-heartbeat"></i> Blood Group
+                </a>
+            </li>
+
+        </ul>
+    </li>
+
+    <!-- ================= SETTINGS ================= -->
+    <li class="treeview <?= ($segment1 == 'change-password') ? 'active menu-open' : '' ?>">
+        <a href="#">
+            <i class="fa fa-cog"></i>
+            <span>Settings</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+        </a>
+
+        <ul class="treeview-menu">
+            <li class="<?= ($segment1 == 'change-password') ? 'active' : '' ?>">
+                <a href="<?= site_url('change-password') ?>">
+                    <i class="fa fa-lock"></i> Change Password
+                </a>
+            </li>
+        </ul>
+    </li>
+ 
